@@ -14,15 +14,124 @@ import torch
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def cluster(data_loader, n_proto, n_iter, n_init=5, feature_dim=1024, n_proto_patches=50000, mode='kmeans', use_cuda=False):
+def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000, 
+                   resolution=1.0, n_neighbors=15, use_cuda=False):
     """
-    K-Means clustering on embedding space
-
-    For further details on FAISS,
-    https://github.com/facebookresearch/faiss/wiki/Faiss-building-blocks:-clustering,-PCA,-quantization
+    Leiden聚类自动确定原型数量
+    
+    参数说明:
+        resolution: Leiden分辨率,控制聚类粒度
+                   - 越大 → 聚类数越多 (如2.0可能产生30+个聚类)
+                   - 越小 → 聚类数越少 (如0.5可能产生8-12个聚类)
+                   - 推荐范围: 0.8-1.5
+        n_neighbors: 邻居数,用于构建KNN图
+    
+    返回:
+        n_patches: 实际采样的patch数量
+        weight: 原型中心 [1, C, feature_dim]
+        n_proto: 自动确定的原型数量
     """
+    import scanpy as sc
+    import anndata
+    import pandas as pd
+    
     n_patches = 0
+    n_total = n_proto_patches  # 不再基于固定n_proto
+    
+    # 采样patches
+    try:
+        n_patches_per_batch = (n_total + len(data_loader) - 1) // len(data_loader)
+    except:
+        n_patches_per_batch = 1000
+    
+    print(f"[Leiden] Sampling maximum of {n_total} patches: {n_patches_per_batch} each from {len(data_loader)}")
+    
+    patches = torch.Tensor(n_total, feature_dim)
+    
+    for batch in tqdm(data_loader):
+        if n_patches >= n_total:
+            continue
+        
+        data = batch['img']
+        with torch.no_grad():
+            data_reshaped = data.reshape(-1, data.shape[-1])
+            np.random.shuffle(data_reshaped)
+            out = data_reshaped[:n_patches_per_batch]
+        
+        size = out.size(0)
+        if n_patches + size > n_total:
+            size = n_total - n_patches
+            out = out[:size]
+        patches[n_patches: n_patches + size] = out
+        n_patches += size
+    
+    print(f"\n[Leiden] Total of {n_patches} patches aggregated")
+    
+    s = time.time()
+    
+    # === Leiden聚类核心代码 ===
+    print(f"\n[Leiden] Running Leiden clustering with resolution={resolution}, n_neighbors={n_neighbors}")
+    
+    # 1. 创建AnnData对象
+    adata = anndata.AnnData(X=patches[:n_patches].cpu().numpy())
+    
+    # 2. 构建邻居图(使用PCA降维以加速)
+    print("[Leiden] Computing PCA...")
+    sc.tl.pca(adata, svd_solver='arpack', n_comps=min(50, feature_dim-1))
+    
+    print("[Leiden] Computing neighbors...")
+    sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=50, 
+                   method='umap', metric='euclidean')
+    
+    # 3. Leiden聚类
+    print("[Leiden] Running Leiden algorithm...")
+    sc.tl.leiden(adata, resolution=resolution, key_added='leiden')
+    
+    # 4. 提取聚类标签
+    leiden_labels = adata.obs['leiden'].astype(int).values
+    n_proto = len(np.unique(leiden_labels))  # 自适应确定的聚类数!
+    
+    print(f"[Leiden] ✓ Automatically determined {n_proto} prototypes!")
+    
+    # 5. 计算每个聚类的中心作为原型
+    centroids = []
+    for c in range(n_proto):
+        mask = leiden_labels == c
+        cluster_patches = patches[:n_patches][mask]
+        centroid = cluster_patches.mean(dim=0)
+        centroids.append(centroid)
+    
+    weight = torch.stack(centroids).unsqueeze(0).numpy()  # [1, C, feature_dim]
+    
+    e = time.time()
+    print(f"[Leiden] Clustering took {e-s:.2f} seconds!")
+    print(f"[Leiden] Cluster sizes: {[(leiden_labels==c).sum() for c in range(n_proto)]}")
+    
+    return n_patches, weight, n_proto  # 注意返回3个值!
 
+
+def cluster(data_loader, n_proto, n_iter, n_init=5, feature_dim=1024, 
+            n_proto_patches=50000, mode='kmeans', use_cuda=False,
+            leiden_resolution=1.0, leiden_neighbors=15):  # 新增参数
+    """
+    K-Means或Leiden clustering on embedding space
+    
+    mode: 'kmeans', 'faiss', 'leiden'
+    """
+    
+    # === 新增: Leiden模式 ===
+    if mode == 'leiden':
+        return cluster_leiden(
+            data_loader, 
+            feature_dim=feature_dim,
+            n_proto_patches=n_proto_patches,
+            resolution=leiden_resolution,
+            n_neighbors=leiden_neighbors,
+            use_cuda=use_cuda
+        )
+    # === 原有K-means代码保持不变 ===
+    
+    n_patches = 0
     n_total = n_proto * n_proto_patches
 
     # Sample equal number of patch features from each WSI
