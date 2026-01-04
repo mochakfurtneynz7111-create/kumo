@@ -1,3 +1,4 @@
+## DMSS的components.py
 import torch.nn as nn
 import torch
 from torch import einsum
@@ -11,6 +12,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.functional import *
 from math import ceil
+
+import numpy as np
 
 
 
@@ -50,7 +53,7 @@ class NystromAttention(nn.Module):
         dim,
         dim_head=64,
         heads=8,
-        num_landmarks=256,
+        num_landmarks=32,
         pinv_iterations=6,
         residual=True,
         residual_conv_kernel=33,
@@ -171,7 +174,7 @@ class Nystromformer(nn.Module):
         depth,
         dim_head=64,
         heads=8,
-        num_landmarks=256,
+        num_landmarks=32,
         pinv_iterations=6,
         attn_values_residual=True,
         attn_values_residual_conv_kernel=33,
