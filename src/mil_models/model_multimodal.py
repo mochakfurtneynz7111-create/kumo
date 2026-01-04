@@ -128,618 +128,6 @@ def construct_proto_embedding(path_proj_dim, append_embed='modality', numOfproto
     return path_proj_dim_new, histo_embedding, gene_embedding
 
 
-
-################################
-# Multimodal fusion approaches #
-################################
-# coattn 3.0
-# class coattn(nn.Module):
-#     def __init__(
-#             self,
-#             omic_sizes=[100, 200, 300, 400, 500, 600],
-#             histo_in_dim=1024,
-#             dropout=0.1,
-#             num_classes=4,
-#             path_proj_dim=256,
-#             num_coattn_layers=1,
-#             modality='both',
-#             histo_agg='mean',
-#             histo_model='PANTHER',
-#             append_embed='none',
-#             mult=1,
-#             net_indiv=False,
-#             numOfproto=16):
-#         """
-#         The central co-attention module where you can do it all!
-
-#         Args:
-#             omic_sizes: List of integers, each indicating number of genes per prototype
-#             histo_in_dim: Dimension of histology feature embedding
-#             num_classes: 4 if we are using NLL, 1 if we are using Cox/Ranking loss
-#             path_proj_dim: Dimension of the embedding space where histology and pathways are fused
-#             modality: ['gene','histo','coattn', 'partial'] 'coattn' accounts for both modalities
-#                 If 'histo' or 'gene', unimodal self-attention
-#             histo_agg: ['mean', 'cat'] Take average of post-attention embeddings ('mean') or concatenate ('cat')
-#             histo_model: ['mil','PANTHER', 'OT', 'H2T']: 'mil' is for non-prototype-based methods
-#             net_indiv (bool): If True, create FFN for each prototype
-#             numOfproto: Number of histology prototypes
-#         """
-
-#         super().__init__()
-
-#         self.num_pathways = len(omic_sizes)
-#         self.num_coattn_layers = num_coattn_layers
-
-#         self.histo_in_dim = histo_in_dim
-#         self.out_mult = mult
-#         self.net_indiv = net_indiv
-#         self.modality = modality
-
-#         self.histo_agg = histo_agg
-
-#         self.numOfproto = numOfproto
-#         self.num_classes = num_classes
-
-#         self.histo_model = histo_model.lower()
-
-#         self.sig_networks = init_per_path_model(omic_sizes)
-#         self.identity = nn.Identity()  # use this layer to calculate ig
-
-#         self.append_embed = append_embed
-
-#         if self.histo_model == 'panther':  # Uses prob/mean/cov
-#             self.path_proj_net = nn.Sequential(nn.Linear(self.histo_in_dim * 2 + 1, path_proj_dim))
-#         else:
-#             self.path_proj_net = nn.Sequential(nn.Linear(self.histo_in_dim, path_proj_dim))
-
-#         if self.histo_model != "mil":
-#             self.path_proj_dim, self.histo_embedding, self.gene_embedding = construct_proto_embedding(path_proj_dim,
-#                                                                                                       self.append_embed,
-#                                                                                                       self.numOfproto,
-#                                                                                                       len(omic_sizes))
-#         else:
-#             self.path_proj_dim = path_proj_dim
-#             self.histo_embedding = None
-#             self.gene_embedding = None
-
-
-#         coattn_list = []
-#         if self.num_coattn_layers == 0:
-#             out_dim = self.path_proj_dim
-
-#             if self.net_indiv:  # Individual MLP per prototype
-#                 feed_forward = FeedForwardEnsemble(out_dim,
-#                                                    self.out_mult,
-#                                                    dropout=dropout,
-#                                                    num=self.numOfproto + len(omic_sizes))
-#             else:
-#                 feed_forward = FeedForward(out_dim, self.out_mult, dropout=dropout)
-
-#             layer_norm = nn.LayerNorm(int(out_dim * self.out_mult))
-#             coattn_list.extend([feed_forward, layer_norm])
-#         else:
-#             out_dim = self.path_proj_dim // 2
-#             out_mult = self.out_mult
-            
-#             if self.modality in ['histo', 'gene']: # If we want to use only single modality + self-attention
-#                 attn_mode = 'self'
-#             elif self.modality == 'survpath':    # SurvPath setting H->P, P->H, P->P
-#                 attn_mode = 'partial'
-#             else:
-#                 attn_mode = 'full'  # Otherwise, perform self & cross attention
-
-#             cross_attender = MMAttentionLayer(
-#                 dim=self.path_proj_dim,
-#                 dim_head=out_dim,
-#                 heads=1,
-#                 residual=False,
-#                 dropout=0.1,
-#                 num_pathways=self.num_pathways,
-#                 attn_mode=attn_mode
-#             )
-
-#             if self.net_indiv:  # Individual MLP per prototype
-#                 feed_forward = FeedForwardEnsemble(out_dim,
-#                                                    out_mult,
-#                                                    dropout=dropout,
-#                                                    num=self.numOfproto + len(omic_sizes))
-#             else:
-#                 feed_forward = FeedForward(out_dim, out_mult, dropout=dropout)
-
-#             layer_norm = nn.LayerNorm(int(out_dim * out_mult))
-#             coattn_list.extend([cross_attender, feed_forward, layer_norm])
-
-
-#         self.coattn = nn.Sequential(*coattn_list)
-
-#         out_dim_final = int(out_dim * self.out_mult)
-#         histo_final_dim = out_dim_final * self.numOfproto if self.histo_agg == 'cat' else out_dim_final
-#         gene_final_dim = out_dim_final
-
-#         if self.modality == 'histo':
-#             in_dim = histo_final_dim
-#         elif self.modality == 'gene':
-#             in_dim = gene_final_dim
-#         else:
-#             in_dim = histo_final_dim + gene_final_dim
-
-#         self.classifier = nn.Linear(in_dim+144, self.num_classes, bias=False)
-
-
-#                 ### Multihead Attention
-#         self.coattn_gene_guided = MultiheadAttention(embed_dim=288, num_heads=1)
-
-#         ### Path Transformer + Attention Head
-#         path_encoder_layer = nn.TransformerEncoderLayer(d_model=288, nhead=8, dim_feedforward=512, dropout=dropout, activation='relu')
-#         self.path_transformer = nn.TransformerEncoder(path_encoder_layer, num_layers=2)
-#         self.path_attention_head = Attn_Net_Gated(L=288, D=288, dropout=dropout, n_classes=1)
-#         # self.path_rho = nn.Sequential(*[nn.Linear(size[2], size[2]), nn.ReLU(), nn.Dropout(dropout)])
-        
-#         ### Omic Transformer + Attention Head
-#         omic_encoder_layer = nn.TransformerEncoderLayer(d_model=288, nhead=8, dim_feedforward=512, dropout=dropout, activation='relu')
-#         self.omic_transformer = nn.TransformerEncoder(omic_encoder_layer, num_layers=2)
-#         self.omic_attention_head = Attn_Net_Gated(L=288, D=288, dropout=dropout, n_classes=1)
-#         # self.omic_rho = nn.Sequential(*[nn.Linear(size[2], size[2]), nn.ReLU(), nn.Dropout(dropout)])
-        
-#         ### Fusion Layer
-       
-#         self.mm = BilinearFusion(dim1=288, dim2=288, scale_dim1=8, scale_dim2=8, mmhid=144)
-       
-#     def forward_no_loss(self, x_path, x_omics, return_attn=False):
-#         """
-#         Args:
-#             x_path: (B, numOfproto, in_dim) in_dim = [prob, mean, cov] (If OT, prob will be uniform, cov will be none)
-#             x_omics:
-#             return_attn:
-
-#         """
-#         device = x_path.device
-        
-#         ## Pathway embeddings
-#         h_omic = []  ## each omic signature goes through it's own FC layer
-#         for idx, sig_feat in enumerate(x_omics):
-#             omic_feat = self.sig_networks[idx](sig_feat.float())  # (B, d)
-#             h_omic.append(omic_feat)
-#         h_omic = torch.stack(h_omic, dim=1)
-
-#         if self.gene_embedding is not None: # Append gene prototype encoding
-#             arr = []
-#             for idx in range(len(h_omic)):
-#                 arr.append(torch.cat([h_omic[idx:idx + 1], self.gene_embedding.to(device)], dim=-1))
-            
-#             h_omic = torch.cat(arr, dim=0)
-#             # torch.Size([64, 50, 288])
-#             # print(h_omic.shape)
-#             # print("h_omic.shape")
-        
-
-#         ## Histology embeddings
-#         # Project wsi to smaller dimension (same as pathway dimension)
-#         h_path = self.path_proj_net(x_path)
-#         # torch.Size([64, 16, 288])
-#         # print(h_path.shape)
-#         # print("h_path.shape")
-
-#         if self.histo_embedding is not None:    # Append histo prototype encoding
-#             arr = []
-#             for idx in range(len(h_path)):
-#                 arr.append(torch.cat([h_path[idx:idx + 1], self.histo_embedding.to(device)], dim=-1))
-#             h_path = torch.cat(arr, dim=0)
-#             # torch.Size([64, 16, 288])
-#             # print(h_path.shape)
-#             # print("h_path.shape")
-
-
-#         # 基因引导融合
-#         # Coattn
-#         h_path_per = h_path.permute(1, 0, 2)  # 转换为 (L, N, E)
-#         h_omic_per = h_omic.permute(1, 0, 2)  # 转换为 (L, N, E)
-#         # 两步渐进式融合
-#         h_path_coattn, A_coattn = self.coattn_gene_guided(h_omic_per, h_path_per, h_path_per)
-#         h_path_coattn, A_coattn = self.coattn_gene_guided(h_omic_per, h_path_coattn, h_path_coattn)
-#         # torch.Size([50, 64, 288])
-#         # print(h_path_coattn.shape)
-#         # print("h_path_coattn.shape")
-
-#         ### Path
-#         h_path_trans = self.path_transformer(h_path_coattn)
-#         # torch.Size([50, 64, 288])
-#         # print(h_path_trans.shape)
-#         # print("h_path_trans.shape")
-#         h_path_trans = h_path_trans.permute(1, 0, 2)  # 变为 (N, L, E)
-#         A_path, h_path_trans = self.path_attention_head(h_path_trans)
-#         A_path = F.softmax(A_path.squeeze(dim=2), dim=1).unsqueeze(dim=1)
-#         h_path_trans = torch.bmm(A_path, h_path_trans).squeeze(dim=1)
-#         # torch.Size([64, 288])
-#         # print(h_path_trans.shape)
-#         # print("h_path_trans.shape")
-
-#         ### Omic
-#         h_omic_trans = self.omic_transformer(h_omic_per)
-#         # torch.Size([50, 64, 288])
-#         # print(h_omic_trans.shape)
-#         # print("h_omic_trans.shape")
-#         h_omic_trans = h_omic_trans.permute(1, 0, 2)  # 变为 (N, L, E)
-#         A_omic, h_omic_trans = self.omic_attention_head(h_omic_trans)
-#         A_omic = F.softmax(A_omic.squeeze(dim=2), dim=1).unsqueeze(dim=1)
-#         h_omic_trans = torch.bmm(A_omic, h_omic_trans).squeeze(dim=1)
-#         # torch.Size([64, 288])
-#         # print(h_omic_trans.shape)
-#         # print("h_omic_trans.shape")
-
-#         mid_h = self.mm(h_path_trans, h_omic_trans)
-#         # torch.Size([64, 144])
-#         # print(mid_h.shape)
-#         # print("mid_h.shape")
-
-
-
-#         # 拼接交互融合
-#         tokens = torch.cat([h_omic, h_path], dim=1) # (B, N_p+N_h, d)
-#         tokens = self.identity(tokens)
-
-#         # Required for visualization
-#         if return_attn:
-#             with torch.no_grad():
-#                 _, attn_pathways, cross_attn_pathways, cross_attn_histology = self.coattn[0](x=tokens, mask=None, return_attention=True)
-
-#         # Pass the token set through co-attention network
-#         mm_embed = self.coattn(tokens)
-
-#         # ---> aggregate
-#         # Pathways
-#         paths_postSA_embed = mm_embed[:, :self.num_pathways, :]
-#         paths_postSA_embed = torch.mean(paths_postSA_embed, dim=1)
-
-#         # Histology
-#         wsi_postSA_embed = mm_embed[:, self.num_pathways:, :]
-#         if self.histo_model == 'mil':
-#             wsi_postSA_embed = torch.mean(wsi_postSA_embed, dim=1)  # For non-prototypes, we just take the mean
-#         else:
-#             wsi_postSA_embed = agg_histo(wsi_postSA_embed, self.histo_agg)
-
-#         if self.modality == 'histo':    # Just use histo for prediction
-#             embedding = wsi_postSA_embed
-#         elif self.modality == 'gene':   # Just use gene for prediction
-#             embedding = paths_postSA_embed
-#         else:   # Use both modalities
-#             embedding = torch.cat([paths_postSA_embed, wsi_postSA_embed,mid_h], dim=1)  # ---> both branches
-
-#         logits = self.classifier(embedding)
-#         out = {'logits': logits}
-#         if return_attn:
-#             out['omic_attn'] = attn_pathways
-#             out['cross_attn'] = cross_attn_pathways
-#             out['path_attn'] = cross_attn_histology
-
-#         return out
-
-
-#     def forward(self, x_path, x_omics, return_attn=False, attn_mask=None, label=None, censorship=None, loss_fn=None):
-
-#         out = self.forward_no_loss(x_path, x_omics, return_attn)
-#         results_dict, log_dict = process_surv(out['logits'], label, censorship, loss_fn)
-#         if return_attn:
-#             results_dict['omic_attn'] = out['omic_attn']
-#             results_dict['cross_attn'] = out['cross_attn']
-#             results_dict['path_attn'] = out['path_attn']
-
-#         results_dict.update(out)
-#         return results_dict, log_dict
-
-# network-pro 最好的
-# class coattn(nn.Module):
-#     def __init__(
-#             self,
-#             omic_sizes=[100, 200, 300, 400, 500, 600],
-#             histo_in_dim=1024,
-#             dropout=0.1,
-#             num_classes=4,
-#             path_proj_dim=256,
-#             num_coattn_layers=1,
-#             modality='both',
-#             histo_agg='mean',
-#             histo_model='PANTHER',
-#             append_embed='none',
-#             mult=1,
-#             net_indiv=False,
-#             numOfproto=16):
-#         """
-#         The central co-attention module where you can do it all!
-
-#         Args:
-#             omic_sizes: List of integers, each indicating number of genes per prototype
-#             histo_in_dim: Dimension of histology feature embedding
-#             num_classes: 4 if we are using NLL, 1 if we are using Cox/Ranking loss
-#             path_proj_dim: Dimension of the embedding space where histology and pathways are fused
-#             modality: ['gene','histo','coattn', 'partial'] 'coattn' accounts for both modalities
-#                 If 'histo' or 'gene', unimodal self-attention
-#             histo_agg: ['mean', 'cat'] Take average of post-attention embeddings ('mean') or concatenate ('cat')
-#             histo_model: ['mil','PANTHER', 'OT', 'H2T']: 'mil' is for non-prototype-based methods
-#             net_indiv (bool): If True, create FFN for each prototype
-#             numOfproto: Number of histology prototypes
-#         """
-
-#         super().__init__()
-
-#         self.num_pathways = len(omic_sizes)
-#         self.num_coattn_layers = num_coattn_layers
-
-#         self.histo_in_dim = histo_in_dim
-#         self.out_mult = mult
-#         self.net_indiv = net_indiv
-#         self.modality = modality
-
-#         self.histo_agg = histo_agg
-
-#         self.numOfproto = numOfproto
-#         self.num_classes = num_classes
-
-#         self.histo_model = histo_model.lower()
-
-#         self.sig_networks = init_per_path_model(omic_sizes)
-#         self.identity = nn.Identity()  # use this layer to calculate ig
-
-#         self.append_embed = append_embed
-
-#         if self.histo_model == 'panther':  # Uses prob/mean/cov
-#             self.path_proj_net = nn.Sequential(nn.Linear(self.histo_in_dim * 2 + 1, path_proj_dim))
-#         else:
-#             self.path_proj_net = nn.Sequential(nn.Linear(self.histo_in_dim, path_proj_dim))
-
-#         if self.histo_model != "mil":
-#             self.path_proj_dim, self.histo_embedding, self.gene_embedding = construct_proto_embedding(path_proj_dim,
-#                                                                                                       self.append_embed,
-#                                                                                                       self.numOfproto,
-#                                                                                                       len(omic_sizes))
-#         else:
-#             self.path_proj_dim = path_proj_dim
-#             self.histo_embedding = None
-#             self.gene_embedding = None
-
-
-#         coattn_list = []
-#         if self.num_coattn_layers == 0:
-#             out_dim = self.path_proj_dim
-
-#             if self.net_indiv:  # Individual MLP per prototype
-#                 feed_forward = FeedForwardEnsemble(out_dim,
-#                                                    self.out_mult,
-#                                                    dropout=dropout,
-#                                                    num=self.numOfproto + len(omic_sizes))
-#             else:
-#                 feed_forward = FeedForward(out_dim, self.out_mult, dropout=dropout)
-
-#             layer_norm = nn.LayerNorm(int(out_dim * self.out_mult))
-#             coattn_list.extend([feed_forward, layer_norm])
-#         else:
-#             out_dim = self.path_proj_dim // 2
-#             out_mult = self.out_mult
-            
-#             if self.modality in ['histo', 'gene']: # If we want to use only single modality + self-attention
-#                 attn_mode = 'self'
-#             elif self.modality == 'survpath':    # SurvPath setting H->P, P->H, P->P
-#                 attn_mode = 'partial'
-#             else:
-#                 attn_mode = 'full'  # Otherwise, perform self & cross attention
-
-#             cross_attender = MMAttentionLayer(
-#                 dim=self.path_proj_dim,
-#                 dim_head=out_dim,
-#                 heads=1,
-#                 residual=False,
-#                 dropout=0.1,
-#                 num_pathways=self.num_pathways,
-#                 attn_mode=attn_mode
-#             )
-
-#             if self.net_indiv:  # Individual MLP per prototype
-#                 feed_forward = FeedForwardEnsemble(out_dim,
-#                                                    out_mult,
-#                                                    dropout=dropout,
-#                                                    num=self.numOfproto + len(omic_sizes))
-#             else:
-#                 feed_forward = FeedForward(out_dim, out_mult, dropout=dropout)
-
-#             layer_norm = nn.LayerNorm(int(out_dim * out_mult))
-#             coattn_list.extend([cross_attender, feed_forward, layer_norm])
-
-
-#         self.coattn = nn.Sequential(*coattn_list)
-
-#         out_dim_final = int(out_dim * self.out_mult)
-#         histo_final_dim = out_dim_final * self.numOfproto if self.histo_agg == 'cat' else out_dim_final
-#         gene_final_dim = out_dim_final
-
-#         if self.modality == 'histo':
-#             in_dim = histo_final_dim
-#         elif self.modality == 'gene':
-#             in_dim = gene_final_dim
-#         else:
-#             in_dim = histo_final_dim + gene_final_dim
-
-#         # self.classifier = nn.Linear(288*3, self.num_classes, bias=False)
-#         self.classifier = nn.Sequential(
-#             nn.Linear(288 * 3, 128),  # 第一个全连接层
-#             nn.ReLU(),                # 激活函数
-#             nn.Linear(128, self.num_classes)  # 输出层
-#         )
-
-#         ### Multihead Attention
-#         self.coattn_gene_guided = MultiheadAttention(embed_dim=288, num_heads=1)
-
-#         ### Path Transformer + Attention Head
-#         path_encoder_layer = nn.TransformerEncoderLayer(d_model=288, nhead=8, dim_feedforward=512, dropout=dropout, activation='relu')
-#         self.path_transformer = nn.TransformerEncoder(path_encoder_layer, num_layers=2)
-#         self.path_attention_head = Attn_Net_Gated(L=288, D=288, dropout=dropout, n_classes=1)
-#         # self.path_rho = nn.Sequential(*[nn.Linear(size[2], size[2]), nn.ReLU(), nn.Dropout(dropout)])
-        
-#         ### Omic Transformer + Attention Head
-#         omic_encoder_layer = nn.TransformerEncoderLayer(d_model=288, nhead=8, dim_feedforward=512, dropout=dropout, activation='relu')
-#         self.omic_transformer = nn.TransformerEncoder(omic_encoder_layer, num_layers=2)
-#         self.omic_attention_head = Attn_Net_Gated(L=288, D=288, dropout=dropout, n_classes=1)
-#         # self.omic_rho = nn.Sequential(*[nn.Linear(size[2], size[2]), nn.ReLU(), nn.Dropout(dropout)])
-        
-#         ### Fusion Layer
-       
-#         self.mm = BilinearFusion(dim1=288, dim2=288, scale_dim1=8, scale_dim2=8, mmhid=144)
-
-
-#          # Pathomics Transformer
-#         # Encoder
-#         self.pathomics_encoder = Transformer_P(288)
-#         # Decoder
-#         self.pathomics_decoder = Transformer_P(288)
-
-#         # P->G Attention
-#         self.P_in_G_Att = MultiheadAttention(embed_dim=288, num_heads=1)
-#         # G->P Attention
-#         self.G_in_P_Att = MultiheadAttention(embed_dim=288, num_heads=1)
-
-#         # Pathomics Transformer Decoder
-#         # Encoder
-#         self.genomics_encoder = Transformer_G(288)
-#         # Decoder
-#         self.genomics_decoder = Transformer_G(288)
-
-#         self.fusion_c="concat"
-
-#         # Classification Layer
-#         if self.fusion_c == "concat":
-#             self.mm = nn.Sequential(
-#                 *[nn.Linear(288 * 2, 288), nn.ReLU(), nn.Linear(288,288), nn.ReLU()]
-#             )
-#         elif self.fusion_c == "bilinear":
-#             self.mm = BilinearFusion(dim1=288, dim2=288, scale_dim1=8, scale_dim2=8, mmhid=288)
-#         else:
-#             raise NotImplementedError("Fusion [{}] is not implemented".format(self.fusion))
-
-
-       
-#     def forward_no_loss(self, x_path, x_omics, return_attn=False):
-#         """
-#         Args:
-#             x_path: (B, numOfproto, in_dim) in_dim = [prob, mean, cov] (If OT, prob will be uniform, cov will be none)
-#             x_omics:
-#             return_attn:
-
-#         """
-#         device = x_path.device
-        
-#         ## Pathway embeddings
-#         h_omic = []  ## each omic signature goes through it's own FC layer
-#         for idx, sig_feat in enumerate(x_omics):
-#             omic_feat = self.sig_networks[idx](sig_feat.float())  # (B, d)
-#             h_omic.append(omic_feat)
-#         h_omic = torch.stack(h_omic, dim=1)
-
-#         if self.gene_embedding is not None: # Append gene prototype encoding
-#             arr = []
-#             for idx in range(len(h_omic)):
-#                 arr.append(torch.cat([h_omic[idx:idx + 1], self.gene_embedding.to(device)], dim=-1))
-            
-#             h_omic = torch.cat(arr, dim=0)
-#             # torch.Size([64, 50, 288])
-#             # print(h_omic.shape)
-#             # print("h_omic.shape")
-        
-
-#         ## Histology embeddings
-#         # Project wsi to smaller dimension (same as pathway dimension)
-#         h_path = self.path_proj_net(x_path)
-#         # torch.Size([64, 16, 288])
-#         # print(h_path.shape)
-#         # print("h_path.shape")
-
-#         if self.histo_embedding is not None:    # Append histo prototype encoding
-#             arr = []
-#             for idx in range(len(h_path)):
-#                 arr.append(torch.cat([h_path[idx:idx + 1], self.histo_embedding.to(device)], dim=-1))
-#             h_path = torch.cat(arr, dim=0)
-#             # torch.Size([64, 16, 288])
-#             # print(h_path.shape)
-#             # print("h_path.shape")
-
-        
-#          # encoder
-#         # pathomics encoder
-#         cls_token_pathomics_encoder, patch_token_pathomics_encoder = self.pathomics_encoder(
-#             h_path)  # cls token + patch tokens
-#         # genomics encoder
-#         cls_token_genomics_encoder, patch_token_genomics_encoder = self.genomics_encoder(
-#             h_omic)  # cls token + patch tokens
-#         # torch.Size([64, 288])
-#         # print(cls_token_pathomics_encoder.shape)
-#         # print("cls_token_pathomics_encoder.shape")
-#         # torch.Size([64, 288])
-#         # print(cls_token_genomics_encoder.shape)
-#         # print("cls_token_genomics_encoder")
-
-        
-
-#         # 拼接交互融合
-#         tokens = torch.cat([patch_token_genomics_encoder, patch_token_pathomics_encoder], dim=1) # (B, N_p+N_h, d)
-#         tokens = self.identity(tokens)
-
-#         # Required for visualization
-#         if return_attn:
-#             with torch.no_grad():
-#                 _, attn_pathways, cross_attn_pathways, cross_attn_histology = self.coattn[0](x=tokens, mask=None, return_attention=True)
-
-#         # Pass the token set through co-attention network
-#         mm_embed = self.coattn(tokens)
-#         # torch.Size([64, 347, 144])
-#         # print(mm_embed.shape)
-#         # print("mm_embed.shape")
-
-
-#         # ---> aggregate
-#         # Pathways
-#         paths_postSA_embed = mm_embed[:, :self.num_pathways, :]
-#         paths_postSA_embed = torch.mean(paths_postSA_embed, dim=1)
-
-#         # Histology
-#         wsi_postSA_embed = mm_embed[:, self.num_pathways:, :]
-#         if self.histo_model == 'mil':
-#             wsi_postSA_embed = torch.mean(wsi_postSA_embed, dim=1)  # For non-prototypes, we just take the mean
-#         else:
-#             wsi_postSA_embed = agg_histo(wsi_postSA_embed, self.histo_agg)
-   
-       
-
-
-#         if self.modality == 'histo':    # Just use histo for prediction
-#             embedding = wsi_postSA_embed
-#         elif self.modality == 'gene':   # Just use gene for prediction
-#             embedding = paths_postSA_embed
-#         else:   # Use both modalities
-#             embedding = torch.cat([paths_postSA_embed, wsi_postSA_embed,cls_token_pathomics_encoder,cls_token_genomics_encoder], dim=1)  # ---> both branches
-
-#         # print(embedding.shape)
-#         # print("embedding.shape")
-#         logits = self.classifier(embedding)
-#         out = {'logits': logits}
-#         if return_attn:
-#             out['omic_attn'] = attn_pathways
-#             out['cross_attn'] = cross_attn_pathways
-#             out['path_attn'] = cross_attn_histology
-
-        
-#         return out
-
-#     def forward(self, x_path, x_omics, return_attn=False, attn_mask=None, label=None, censorship=None, loss_fn=None):
-
-#         out = self.forward_no_loss(x_path, x_omics, return_attn)
-
-#         results_dict, log_dict = process_surv(out['logits'], label, censorship, loss_fn)
-#         if return_attn:
-#             results_dict['omic_attn'] = out['omic_attn']
-#             results_dict['cross_attn'] = out['cross_attn']
-#             results_dict['path_attn'] = out['path_attn']
-
-#         results_dict.update(out)
-#         return results_dict, log_dict
-
 class coattn(nn.Module):
     def __init__(
             self,
@@ -798,12 +186,17 @@ class coattn(nn.Module):
             self.path_proj_net = nn.Sequential(nn.Linear(self.histo_in_dim * 2 + 1, path_proj_dim))
         else:
             self.path_proj_net = nn.Sequential(nn.Linear(self.histo_in_dim, path_proj_dim))
+        
+        # 【修改点 1】保存基础维度，供 forward 中动态调整使用
+        self.path_proj_dim_base = path_proj_dim 
 
         if self.histo_model != "mil":
-            self.path_proj_dim, self.histo_embedding, self.gene_embedding = construct_proto_embedding(path_proj_dim,
-                                                                                                      self.append_embed,
-                                                                                                      self.numOfproto,
-                                                                                                      len(omic_sizes))
+            self.path_proj_dim, self.histo_embedding, self.gene_embedding = construct_proto_embedding(path_proj_dim,self.append_embed,self.numOfproto,len(omic_sizes))
+            # 🔴 新增: 保存配置以便动态调整
+            self.numOfproto_histo = numOfproto
+            self.append_embed = append_embed
+            # self.path_proj_dim = path_proj_dim
+            self._embedding_initialized = False
         else:
             self.path_proj_dim = path_proj_dim
             self.histo_embedding = None
@@ -821,6 +214,10 @@ class coattn(nn.Module):
                                                    num=self.numOfproto + len(omic_sizes))
             else:
                 feed_forward = FeedForward(out_dim, self.out_mult, dropout=dropout)
+                
+            if self.net_indiv:
+                print("Warning: Disabling net_indiv because prototype count is dynamic. Using shared FeedForward.")
+            feed_forward = FeedForward(out_dim, self.out_mult, dropout=dropout)
 
             layer_norm = nn.LayerNorm(int(out_dim * self.out_mult))
             coattn_list.extend([feed_forward, layer_norm])
@@ -852,6 +249,9 @@ class coattn(nn.Module):
                                                    num=self.numOfproto + len(omic_sizes))
             else:
                 feed_forward = FeedForward(out_dim, out_mult, dropout=dropout)
+            if self.net_indiv:
+                print("Warning: Disabling net_indiv because prototype count is dynamic. Using shared FeedForward.")
+            feed_forward = FeedForward(out_dim, out_mult, dropout=dropout)
 
             layer_norm = nn.LayerNorm(int(out_dim * out_mult))
             coattn_list.extend([cross_attender, feed_forward, layer_norm])
@@ -859,26 +259,163 @@ class coattn(nn.Module):
 
         self.coattn = nn.Sequential(*coattn_list)
 
-       
+        """
         # self.classifier = nn.Linear(288*3, self.num_classes, bias=False)
         self.classifier = nn.Sequential(
             nn.Linear(288 * 3, 128),  # 第一个全连接层
             nn.ReLU(),                # 激活函数
             nn.Linear(128, self.num_classes)  # 输出层
-        )
-
-       
+        )       
 
          # Pathomics Transformer
         # Encoder
         self.pathomics_encoder = Transformer_P(288)
-        
-        
+             
         # Pathomics Transformer Decoder
         # Encoder
         self.genomics_encoder = Transformer_G(288)
+        """
+        if self.num_coattn_layers > 0:
+            # Co-Attention 部分 (144 + 144) + Transformer 部分 (288 + 288) = 864
+            # 公式: (path_proj_dim // 2) * 2 + path_proj_dim * 2 = path_proj_dim * 3
+            clf_in_dim = self.path_proj_dim * 3
+        else:
+            # 如果没有 Co-Attention 层，维度保持不变
+            # 288 * 4 = 1152
+            clf_in_dim = self.path_proj_dim * 4
+        self.classifier = nn.Sequential(
+            nn.Linear(clf_in_dim, 128),  # 动态维度
+            nn.ReLU(),
+            nn.Linear(128, self.num_classes)
+        )
+
+        # 【修改点 3】Transformer 也不要写死 288，用变量
+        self.pathomics_encoder = Transformer_P(self.path_proj_dim)
+        self.genomics_encoder = Transformer_G(self.path_proj_dim)
+
+    def forward_no_loss_after(self, x_path, x_omics, return_attn=False):
+        """
+        Args:
+            x_path: (B, numOfproto, in_dim) in_dim = [prob, mean, cov] (If OT, prob will be uniform, cov will be none)
+            x_omics:
+            return_attn:
+        """
+        device = x_path.device
+
+        ## Pathway embeddings
+        h_omic = []  ## each omic signature goes through it's own FC layer
+        for idx, sig_feat in enumerate(x_omics):
+            # 调试信息
+            print(f"[Debug] idx={idx}, sig_feat.shape={sig_feat.shape}")
+
+            # 维度修正
+            if sig_feat.dim() == 1:
+                print(f"[Warning] Fixing dimension at idx={idx}")
+                sig_feat = sig_feat.unsqueeze(0)
+
+            omic_feat = self.sig_networks[idx](sig_feat.float())
+            print(f"[Debug] idx={idx}, omic_feat.shape={omic_feat.shape}")
+            h_omic.append(omic_feat)
+
+        print(f"[Debug] Before stack: len(h_omic)={len(h_omic)}")
+        h_omic = torch.stack(h_omic, dim=1)
+        print(f"[Debug] After stack: h_omic.shape={h_omic.shape}")
+        
+        if self.gene_embedding is not None: # Append gene prototype encoding
+            arr = []
+            for idx in range(len(h_omic)):
+                arr.append(torch.cat([h_omic[idx:idx + 1], self.gene_embedding.to(device)], dim=-1))
+            
+            h_omic = torch.cat(arr, dim=0)
+            # torch.Size([64, 50, 288])
+            # print(h_omic.shape)
+            # print("h_omic.shape")
         
 
+        ## Histology embeddings
+        # Project wsi to smaller dimension (same as pathway dimension)
+        h_path = self.path_proj_net(x_path)
+        # torch.Size([64, 16, 288])
+        # print(h_path.shape)
+        # print("h_path.shape")
+
+        if self.histo_embedding is not None:    # Append histo prototype encoding
+            arr = []
+            for idx in range(len(h_path)):
+                arr.append(torch.cat([h_path[idx:idx + 1], self.histo_embedding.to(device)], dim=-1))
+            h_path = torch.cat(arr, dim=0)
+            # torch.Size([64, 16, 288])
+            # print(h_path.shape)
+            # print("h_path.shape")
+
+        
+         # encoder
+        # pathomics encoder
+        cls_token_pathomics_encoder, patch_token_pathomics_encoder = self.pathomics_encoder(
+            h_path)  # cls token + patch tokens
+        # genomics encoder
+        cls_token_genomics_encoder, patch_token_genomics_encoder = self.genomics_encoder(
+            h_omic)  # cls token + patch tokens
+        # torch.Size([64, 288])
+        # print(patch_token_pathomics_encoder.shape)
+        # print("patch_token_pathomics_encoder.shape")
+        # # torch.Size([64, 288])
+        # print(patch_token_genomics_encoder.shape)
+        # print("patch_token_genomics_encoder")
+
+        
+
+        # # # 拼接交互融合
+        tokens = torch.cat([patch_token_genomics_encoder, patch_token_pathomics_encoder], dim=1) # (B, N_p+N_h, d)
+        tokens = self.identity(tokens)
+
+        # # # # Required for visualization
+        if return_attn:
+            with torch.no_grad():
+                _, attn_pathways, cross_attn_pathways, cross_attn_histology = self.coattn[0](x=tokens, mask=None, return_attention=True)
+
+        # # # Pass the token set through co-attention network
+        mm_embed = self.coattn(tokens)
+        # # torch.Size([64, 347, 144])
+        # # # print(mm_embed.shape)
+        # # # print("mm_embed.shape")
+
+
+        # # ---> aggregate
+        # # Pathways
+        paths_postSA_embed = mm_embed[:, :self.num_pathways, :]
+        paths_postSA_embed = torch.mean(paths_postSA_embed, dim=1)
+
+        # Histology
+        wsi_postSA_embed = mm_embed[:, self.num_pathways:, :]
+        if self.histo_model == 'mil':
+            wsi_postSA_embed = torch.mean(wsi_postSA_embed, dim=1)  # For non-prototypes, we just take the mean
+        else:
+            wsi_postSA_embed = agg_histo(wsi_postSA_embed, self.histo_agg)
+   
+       
+
+
+        if self.modality == 'histo':    # Just use histo for prediction
+            embedding = wsi_postSA_embed
+        elif self.modality == 'gene':   # Just use gene for prediction
+            embedding = paths_postSA_embed
+        else:   # Use both modalities
+            embedding = torch.cat([paths_postSA_embed, wsi_postSA_embed,cls_token_pathomics_encoder,cls_token_genomics_encoder], dim=1)  # ---> both branches
+
+        # print(embedding.shape)
+        # print("embedding.shape")
+        logits = self.classifier(embedding)
+        out = {'logits': logits}
+        if return_attn:
+            out['omic_attn'] = attn_pathways
+            print(attn_pathways.shape)
+            out['cross_attn'] = cross_attn_pathways
+            print(cross_attn_pathways.shape)
+            out['path_attn'] = cross_attn_histology
+            print(cross_attn_histology.shape)
+
+        return out
      
        
     def forward_no_loss(self, x_path, x_omics, return_attn=False):
@@ -890,6 +427,30 @@ class coattn(nn.Module):
 
         """
         device = x_path.device
+        
+        # 🔴 新增: 动态调整embedding维度
+        if self.histo_embedding is not None:
+            actual_numOfproto = x_path.shape[1]
+            
+            if actual_numOfproto != self.numOfproto_histo or not self._embedding_initialized:
+                print(f"🔧 Adjusting histo_embedding: {self.numOfproto_histo} → {actual_numOfproto}")
+                
+                _, new_histo_emb, _ = construct_proto_embedding(
+                    self.path_proj_dim,
+                    self.append_embed,
+                    actual_numOfproto,
+                    len(self.sig_networks)
+                )
+                
+                if isinstance(new_histo_emb, torch.nn.Parameter):
+                    # 已经是Parameter,直接注册
+                    self.register_parameter('histo_embedding', torch.nn.Parameter(new_histo_emb.to(device)))
+                else:
+                    # 普通Tensor,转为Parameter后注册
+                    self.register_parameter('histo_embedding', torch.nn.Parameter(new_histo_emb.to(device), requires_grad=True))
+                
+                self.numOfproto_histo = actual_numOfproto
+                self._embedding_initialized = True
         
         ## Pathway embeddings
         h_omic = []  ## each omic signature goes through it's own FC layer
