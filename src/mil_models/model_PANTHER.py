@@ -19,10 +19,25 @@ class PANTHER(nn.Module):
 
         self.config = config
         emb_dim = config.in_dim
-
+        
+        # === 关键修改: 如果使用Leiden,从原型文件读取实际数量 ===
+        if config.load_proto and hasattr(config, 'use_leiden') and config.use_leiden:
+            # 从原型文件读取实际的聚类数
+            from utils.file_utils import load_pkl
+            proto_data = load_pkl(config.proto_path)
+            
+            if 'n_proto' in proto_data:
+                actual_n_proto = proto_data['n_proto']
+                print(f"[PANTHER] Loading Leiden prototypes: {actual_n_proto} prototypes")
+                config.out_size = actual_n_proto  # 动态更新!
+            else:
+                # 兼容旧格式
+                actual_n_proto = proto_data['prototypes'].shape[1]
+                config.out_size = actual_n_proto
+        
         self.emb_dim = emb_dim
         self.heads = config.heads
-        self.outsize = config.out_size
+        self.outsize = config.out_size  # 现在是动态的!
         self.load_proto = config.load_proto
         self.mode = mode
 
