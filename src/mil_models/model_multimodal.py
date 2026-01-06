@@ -143,7 +143,8 @@ class coattn(nn.Module):
             append_embed='none',
             mult=1,
             net_indiv=False,
-            numOfproto=16):
+            numOfproto=16,
+            proto_path=None):
         """
         The central co-attention module where you can do it all!
 
@@ -288,9 +289,41 @@ class coattn(nn.Module):
             nn.ReLU(),
             nn.Linear(128, self.num_classes)
         )
+        
+        # 🔥 修改：直接使用 proto_path（不使用 args）
+        leiden_info = None
 
-        # 【修改点 3】Transformer 也不要写死 288，用变量
-        self.pathomics_encoder = Transformer_P(self.path_proj_dim)
+        if proto_path is not None:
+            try:
+                from utils.file_utils import load_pkl
+
+                print(f"[MultimodalModel] Loading proto from: {proto_path}")
+                proto_data = load_pkl(proto_path)
+
+                # 检查是否包含Leiden信息
+                if 'feature_adjacency' in proto_data:
+                    leiden_info = {
+                        'n_proto': proto_data.get('n_proto'),
+                        'feature_adjacency': proto_data.get('feature_adjacency'),
+                        'spatial_centers': proto_data.get('spatial_centers'),
+                        'spatial_adjacency': proto_data.get('spatial_adjacency'),
+                    }
+                    print(f"[MultimodalModel] ✓ Loaded Leiden info")
+                    print(f"[MultimodalModel]   - n_proto: {leiden_info['n_proto']}")
+                    print(f"[MultimodalModel]   - feature_adjacency: {leiden_info['feature_adjacency'].shape}")
+                    print(f"[MultimodalModel]   - spatial_centers: {leiden_info['spatial_centers'].shape}")
+                else:
+                    print(f"[MultimodalModel] Proto file has no Leiden info, using standard architecture")
+            except Exception as e:
+                print(f"[MultimodalModel] Failed to load Leiden info: {e}")
+                import traceback
+                traceback.print_exc()
+                leiden_info = None
+        else:
+            print(f"[MultimodalModel] No proto_path specified, using standard architecture")
+
+        # 创建Transformer（传入Leiden信息）
+        self.pathomics_encoder = Transformer_P(self.path_proj_dim, leiden_info=leiden_info)
         self.genomics_encoder = Transformer_G(self.path_proj_dim)
 
     def forward_no_loss_after(self, x_path, x_omics, return_attn=False):
