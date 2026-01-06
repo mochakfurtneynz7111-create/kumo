@@ -42,17 +42,18 @@ def main(args):
     loader_train = dataset_splits['train']
     
     # ========== 聚类: 支持K-means和Leiden ==========
+    # ========== 聚类 ==========
     if args.mode == 'leiden':
-        # Leiden模式: 返回3个值 (n_patches, weights, n_proto_actual)
         print(f"\n{'='*60}")
         print(f"Using Leiden clustering (HPL method)")
         print(f"Resolution: {args.leiden_resolution}")
         print(f"Neighbors: {args.leiden_neighbors}")
         print(f"{'='*60}\n")
         
-        _, weights, n_proto_actual = cluster(
+        # 调用 cluster 函数
+        _, weights, n_proto_actual, leiden_extra_info = cluster(
             loader_train,
-            n_proto=None,  # Leiden不需要预设数量
+            n_proto=None,
             n_iter=args.n_iter,
             n_init=args.n_init,
             feature_dim=args.in_dim,
@@ -65,18 +66,31 @@ def main(args):
         
         print(f"\n{'='*60}")
         print(f"✓ Leiden automatically determined {n_proto_actual} prototypes!")
-        print(f"  (ignoring --n_proto={args.n_proto})")
         print(f"{'='*60}\n")
         
-        actual_n_proto = n_proto_actual
+        # 🔥 构建完整的保存字典
+        save_dict = {
+            'prototypes': weights,
+            'n_proto': n_proto_actual,
+            **leiden_extra_info  # 包含所有 Leiden 信息
+        }
+        
+        # 生成文件名
+        feat_name = args.data_source[0].split('/')[-2]
+        filename = (f"prototypes_c{n_proto_actual}_{feat_name}_"
+                   f"leiden_res{args.leiden_resolution}_"
+                   f"num_{args.n_proto_patches:.1e}.pkl")
+        
+        # 打印保存信息
+        print(f"\n[Save] Saving to {filename}")
+        print(f"[Save] Keys: {list(save_dict.keys())}")
+        if 'feature_adjacency' in save_dict:
+            print(f"[Save] Feature adjacency shape: {save_dict['feature_adjacency'].shape}")
+        if 'spatial_centers' in save_dict:
+            print(f"[Save] Spatial centers shape: {save_dict['spatial_centers'].shape}")
         
     else:
-        # K-means/FAISS模式: 返回2个值 (n_patches, weights)
-        print(f"\n{'='*60}")
-        print(f"Using {args.mode.upper()} clustering")
-        print(f"Number of prototypes: {args.n_proto} (fixed)")
-        print(f"{'='*60}\n")
-        
+        # K-means/FAISS 模式
         _, weights = cluster(
             loader_train,
             n_proto=args.n_proto,
@@ -88,20 +102,47 @@ def main(args):
             use_cuda=True if torch.cuda.is_available() else False
         )
         
-        actual_n_proto = args.n_proto
+        n_proto_actual = args.n_proto
+        
+        # K-means 保存字典
+        save_dict = {
+            'prototypes': weights,
+            'n_proto': n_proto_actual,
+            'mode': args.mode
+        }
+        
+        # 生成文件名
+        feat_name = args.data_source[0].split('/')[-2]
+        filename = (f"prototypes_c{n_proto_actual}_{feat_name}_"
+                   f"{args.mode}_num_{args.n_proto_patches:.1e}.pkl")
     
+    # 🔥 统一保存（确保不会被覆盖）
+    save_path = j_(args.split_dir, 'prototypes', filename)
+    save_pkl(save_path, save_dict)
+    
+    # 打印最终确认
+    print(f"\n{'='*60}")
+    print(f"✓ Prototypes saved to:")
+    print(f"  {save_path}")
+    print(f"  - Number of prototypes: {n_proto_actual}")
+    print(f"  - Prototype shape: {weights.shape}")
+    print(f"  - Clustering mode: {args.mode}")
+    if args.mode == 'leiden':
+        print(f"  - Contains Leiden info: {'feature_adjacency' in save_dict}")
+    print(f"{'='*60}\n")
+    """
     # ========== 保存原型 ==========
     # 生成文件名
     mode_str = f"{args.mode}_res{args.leiden_resolution:.1f}" if args.mode == 'leiden' else args.mode
     
     save_fpath = j_(args.split_dir,
                     'prototypes',
-                    f"prototypes_c{actual_n_proto}_{args.data_source[0].split('/')[-2]}_{mode_str}_num_{args.n_proto_patches:.1e}.pkl")
+                    f"prototypes_c{n_proto_actual}_{args.data_source[0].split('/')[-2]}_{mode_str}_num_{args.n_proto_patches:.1e}.pkl")
     
     # 保存
     save_pkl(save_fpath, {
         'prototypes': weights,
-        'n_proto': actual_n_proto,
+        'n_proto': n_proto_actual,
         'mode': args.mode,
         'resolution': args.leiden_resolution if args.mode == 'leiden' else None
     })
@@ -109,11 +150,11 @@ def main(args):
     print(f"\n{'='*60}")
     print(f"✓ Prototypes saved to:")
     print(f"  {save_fpath}")
-    print(f"  - Number of prototypes: {actual_n_proto}")
+    print(f"  - Number of prototypes: {n_proto_actual}")
     print(f"  - Prototype shape: {weights.shape}")
     print(f"  - Clustering mode: {args.mode}")
     print(f"{'='*60}\n")
-
+    """
 # Generic training settings
 parser = argparse.ArgumentParser(description='Configurations for WSI Training')
 parser.add_argument('--seed', type=int, default=1,
