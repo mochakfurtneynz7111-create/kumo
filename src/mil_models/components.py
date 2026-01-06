@@ -27,6 +27,8 @@ from torch.nn.parameter import Parameter
 from torch.nn import Module
 from typing import Optional
 
+from .spatial_attention import SpatialAwareAttention
+
 
 
 def moore_penrose_iter_pinv(x, iters=6):
@@ -414,7 +416,14 @@ class Transformer_P(nn.Module):
             )
             
             # Layer 2: 标准注意力
-            self.layer2 = TransLayer(dim=feature_dim)
+            # self.layer2 = TransLayer(dim=feature_dim)
+            # ✅ Layer 2: 空间感知注意力
+            self.layer2 = SpatialAwareAttention(
+                dim=feature_dim,
+                spatial_centers=leiden_info['spatial_centers'],
+                heads=8,
+                spatial_weight=0.3
+            )
             
             self.use_leiden = True
             
