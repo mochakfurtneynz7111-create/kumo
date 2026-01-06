@@ -86,21 +86,53 @@ class WSIProtoDataset(Dataset):
         # Read features (and coordinates, Optional) from pt/h5 file
         all_features = []
         all_coords = []
+
         for feat_path in feat_paths:
             if self.use_h5:
                 with h5py.File(feat_path, 'r') as f:
                     features = f['features'][:]
-            else:
-                features = torch.load(feat_path)
 
+                    # 🔥 新增：读取坐标
+                    if 'coords_patching' in f.keys():
+                        coords = f['coords_patching'][:]  # (N, 2)
+                    elif 'coords' in f.keys():
+                        # 如果没有coords_patching，尝试coords（需要去掉batch维度）
+                        coords = f['coords'][:]
+                        if len(coords.shape) == 3:  # (1, N, 2)
+                            coords = np.squeeze(coords, axis=0)  # → (N, 2)
+                    else:
+                        # 如果完全没有坐标，使用假坐标
+                        print(f"[Warning] No coords found in {feat_path}, using fake coords")
+                        coords = None
+            else:
+                # PT格式
+                features = torch.load(feat_path)
+                coords = None  # PT格式通常没有坐标
+
+            # 处理features的维度
             if len(features.shape) > 2:
-                assert features.shape[0] == 1, f'{features.shape} is not compatible! It has to be (1, numOffeats, feat_dim) or (numOffeats, feat_dim)'
+                assert features.shape[0] == 1, f'{features.shape} is not compatible!'
                 features = np.squeeze(features, axis=0)
 
             all_features.append(features)
+
+            # 🔥 新增：收集坐标
+            if coords is not None:
+                all_coords.append(coords)
+            else:
+                # 使用假坐标（顺序索引）
+                fake_coords = np.arange(len(features)).reshape(-1, 1)
+                fake_coords = np.tile(fake_coords, (1, 2)).astype(np.float32)
+                all_coords.append(fake_coords)
+
+        # 拼接所有features和coords
         all_features = torch.from_numpy(np.concatenate(all_features, axis=0))
+        all_coords = torch.from_numpy(np.concatenate(all_coords, axis=0))  # 🔥 修改
 
         out = {'img': all_features,
-               'coords': all_coords}
+               'coords': all_coords}  # 🔥 现在有真实坐标了！
 
         return out
+        
+    
+       
