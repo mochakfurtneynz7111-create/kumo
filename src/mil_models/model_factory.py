@@ -69,48 +69,59 @@ def create_multimodal_survival_model(args, omic_sizes=[]):
     elif args.loss_fn == 'rank':
         num_classes = 1
 
-    if args.model_mm_type in ['coattn', 'gene', 'histo']:   # This enables self-attn/coattn within/across modalities
-        #
-        # ex 1: Coattn across both modalities - modality: 'both' args.model_mm_type: 'coattn' num_coattn_layers: 1
-        # ex 2: Self-attn within a modality - modality: 'both' args.model_mm_type: 'histo' or 'gene'
-        #
-        model = coattn(omic_sizes=omic_sizes,
-                       histo_in_dim=args.feat_dim,
-                       path_proj_dim=256,
-                       num_classes=num_classes,
-                       num_coattn_layers=args.num_coattn_layers,
-                       modality=args.model_mm_type,
-                       histo_agg=args.histo_agg,                       
-                       histo_model=args.model_histo_type,
-                       append_embed=args.append_embed,
-                       net_indiv=args.net_indiv,
-                       )
+    # 🔥 新增：获取 proto_path
+    proto_path = None
+    if hasattr(args, 'load_proto') and args.load_proto:
+        if hasattr(args, 'proto_path'):
+            proto_path = args.proto_path
+            print(f"[model_factory] proto_path from args: {proto_path}")
+        else:
+            print(f"[model_factory] Warning: load_proto=True but proto_path not found in args")
+
+    if args.model_mm_type in ['coattn', 'gene', 'histo']:
+        model = coattn(
+            omic_sizes=omic_sizes,
+            histo_in_dim=args.feat_dim,
+            path_proj_dim=256,
+            num_classes=num_classes,
+            num_coattn_layers=args.num_coattn_layers,
+            modality=args.model_mm_type,
+            histo_agg=args.histo_agg,                       
+            histo_model=args.model_histo_type,
+            append_embed=args.append_embed,
+            net_indiv=args.net_indiv,
+            proto_path=proto_path  # 🔥 新增：传递 proto_path
+        )
 
     elif args.model_mm_type == 'survpath':
-        model = coattn(omic_sizes=omic_sizes,
-                       histo_in_dim=args.feat_dim,
-                       path_proj_dim=256,
-                       num_classes=num_classes,
-                       num_coattn_layers=1,
-                       modality=args.model_mm_type,
-                       histo_agg='mean',                       
-                       histo_model='mil',
-                       append_embed=None,
-                       net_indiv=False,
-                       )
+        model = coattn(
+            omic_sizes=omic_sizes,
+            histo_in_dim=args.feat_dim,
+            path_proj_dim=256,
+            num_classes=num_classes,
+            num_coattn_layers=1,
+            modality=args.model_mm_type,
+            histo_agg='mean',                       
+            histo_model='mil',
+            append_embed=None,
+            net_indiv=False,
+            proto_path=proto_path  # 🔥 新增：传递 proto_path
+        )
 
     elif args.model_mm_type == 'coattn_mot':
-        model = coattn_mot(omic_sizes=omic_sizes,
-                            histo_in_dim=args.feat_dim,
-                            path_proj_dim=256,
-                            num_classes=num_classes,
-                            num_coattn_layers=args.num_coattn_layers,
-                            modality=args.model_mm_type,
-                            histo_agg=args.histo_agg,                       
-                            histo_model=args.model_histo_type,
-                            append_embed=args.append_embed,
-                            net_indiv=args.net_indiv,
-                            )
+        model = coattn_mot(
+            omic_sizes=omic_sizes,
+            histo_in_dim=args.feat_dim,
+            path_proj_dim=256,
+            num_classes=num_classes,
+            num_coattn_layers=args.num_coattn_layers,
+            modality=args.model_mm_type,
+            histo_agg=args.histo_agg,                       
+            histo_model=args.model_histo_type,
+            append_embed=args.append_embed,
+            net_indiv=args.net_indiv,
+            proto_path=proto_path  # 🔥 新增：传递 proto_path (如果需要)
+        )
 
     return model
 
