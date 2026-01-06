@@ -231,6 +231,77 @@ class TransLayer(nn.Module):
         x = x + self.attn(self.norm(x))
         return x
 
+class GraphGuidedAttention(nn.Module):
+    """
+    基于Leiden邻居图的稀疏注意力
+    """
+    def __init__(self, dim=512, adjacency_matrix=None, heads=8):
+        super(GraphGuidedAttention, self).__init__()
+        
+        self.heads = heads
+        self.scale = (dim // heads) ** -0.5
+        
+        self.qkv = nn.Linear(dim, dim * 3, bias=False)
+        self.proj = nn.Linear(dim, dim)
+        
+        # 注册邻接矩阵
+        if adjacency_matrix is not None:
+            n_proto = adjacency_matrix.shape[0]
+            
+            # 🔥 创建扩展矩阵以包含 cls_token
+            extended_adj = np.zeros((n_proto + 1, n_proto + 1))
+            
+            # cls_token (索引0) 与所有token全连接
+            extended_adj[0, :] = 1
+            extended_adj[:, 0] = 1
+            
+            # 原型部分使用 Leiden 图 + 自环
+            proto_adj_with_self = adjacency_matrix + np.eye(n_proto)
+            extended_adj[1:, 1:] = proto_adj_with_self
+            
+            self.register_buffer('attn_mask', 
+                               torch.from_numpy(extended_adj).float())
+            
+            print(f"[GraphGuidedAttention] Original graph: {n_proto} nodes, "
+                  f"{adjacency_matrix.sum():.0f} edges")
+            print(f"[GraphGuidedAttention] Extended mask shape: {extended_adj.shape} "
+                  f"(includes cls_token)")
+        else:
+            self.attn_mask = None
+            print(f"[GraphGuidedAttention] No graph mask, using full attention")
+        
+        self.norm = nn.LayerNorm(dim)
+    
+    def forward(self, x):
+        # x: (B, N, D) where N = 1 + n_proto (包含cls_token)
+        B, N, D = x.shape
+        
+        qkv = self.qkv(x).reshape(B, N, 3, self.heads, D // self.heads)
+        qkv = qkv.permute(2, 0, 3, 1, 4)
+        q, k, v = qkv[0], qkv[1], qkv[2]
+        
+        # 计算注意力分数
+        attn = (q @ k.transpose(-2, -1)) * self.scale  # (B, heads, N, N)
+        
+        # 应用图mask
+        if self.attn_mask is not None:
+            if self.attn_mask.shape[0] != N:
+                raise ValueError(
+                    f"Mask shape {self.attn_mask.shape} doesn't match "
+                    f"sequence length {N}. Expected {(N, N)}"
+                )
+            
+            # 扩展mask到 batch 和 heads 维度
+            mask = self.attn_mask.unsqueeze(0).unsqueeze(0)  # (1, 1, N, N)
+            attn = attn.masked_fill(mask == 0, float('-inf'))
+        
+        attn = attn.softmax(dim=-1)
+        
+        # 聚合
+        x = (attn @ v).transpose(1, 2).reshape(B, N, D)
+        x = self.proj(x)
+        
+        return x + self.norm(x)
 
 class PPEG(nn.Module):
     def __init__(self, dim=512):
@@ -248,37 +319,157 @@ class PPEG(nn.Module):
         x = torch.cat((cls_token.unsqueeze(1), x), dim=1)
         return x
 
+class PrototypePPEG(nn.Module):
+    """
+    Prototype-aware Position Encoding Generator
+    利用原型的真实空间位置信息
+    """
+    def __init__(self, dim=512, num_prototypes=400, 
+                 spatial_centers=None, use_spatial_bias=True):
+        super(PrototypePPEG, self).__init__()
+        
+        # 标准PPEG卷积（多尺度）
+        self.proj = nn.Conv2d(dim, dim, 7, 1, 7 // 2, groups=dim)
+        self.proj1 = nn.Conv2d(dim, dim, 5, 1, 5 // 2, groups=dim)
+        self.proj2 = nn.Conv2d(dim, dim, 3, 1, 3 // 2, groups=dim)
+        
+        # 🔥 保存原型数量
+        self.num_prototypes = num_prototypes
+        
+        # 空间位置编码
+        self.use_spatial_bias = use_spatial_bias
+        if use_spatial_bias and spatial_centers is not None:
+            self.register_buffer('spatial_centers', 
+                               torch.from_numpy(spatial_centers).float())
+            
+            # 可学习的空间编码MLP
+            self.spatial_encoder = nn.Sequential(
+                nn.Linear(2, dim // 4),
+                nn.ReLU(),
+                nn.Linear(dim // 4, dim)
+            )
+            print(f"[PrototypePPEG] Initialized with {num_prototypes} spatial centers")
+        else:
+            self.spatial_centers = None
+            self.spatial_encoder = None
+            print(f"[PrototypePPEG] Initialized without spatial bias")
+
+    def forward(self, x, H, W):
+        # x: (B, N, D) where N = 1(cls) + n_proto + padding
+        B, N, C = x.shape
+        
+        # 分离 cls_token 和 features
+        cls_token, feat_token = x[:, 0], x[:, 1:]  # (B, 1, D), (B, N-1, D)
+        
+        # === 标准PPEG：2D卷积位置编码 ===
+        cnn_feat = feat_token.transpose(1, 2).view(B, C, H, W)
+        x_pos = self.proj(cnn_feat) + cnn_feat + \
+                self.proj1(cnn_feat) + self.proj2(cnn_feat)
+        x_pos = x_pos.flatten(2).transpose(1, 2)  # (B, N-1, D)
+        
+        # === 🔥 新增：空间位置偏置 ===
+        if self.use_spatial_bias and self.spatial_encoder is not None:
+            # 利用原型的实际空间坐标
+            spatial_bias = self.spatial_encoder(self.spatial_centers)  # (n_proto, D)
+            spatial_bias = spatial_bias.unsqueeze(0)  # (1, n_proto, D)
+            
+            # 🔥 只对有效原型部分添加空间偏置
+            # x_pos: (B, N-1, D) where N-1 = n_proto + padding
+            n_proto = spatial_bias.shape[1]  # 409
+            
+            # 只给前 n_proto 个 token 添加空间偏置
+            x_pos[:, :n_proto, :] = x_pos[:, :n_proto, :] + spatial_bias
+            # padding 部分 x_pos[:, n_proto:, :] 保持不变
+        
+        # 重新拼接 cls token
+        x = torch.cat((cls_token.unsqueeze(1), x_pos), dim=1)
+        return x
 
 class Transformer_P(nn.Module):
-    def __init__(self, feature_dim=512):
+    def __init__(self, feature_dim=512, leiden_info=None):
         super(Transformer_P, self).__init__()
-        # Encoder
-        self.pos_layer = PPEG(dim=feature_dim)
+        
         self.cls_token = nn.Parameter(torch.randn(1, 1, feature_dim))
         nn.init.normal_(self.cls_token, std=1e-6)
-        self.layer1 = TransLayer(dim=feature_dim)
-        self.layer2 = TransLayer(dim=feature_dim)
+        
+        # 判断是否使用Leiden引导
+        if leiden_info is not None and 'feature_adjacency' in leiden_info:
+            print("[Transformer_P] Using Leiden-guided architecture")
+            
+            # 🔥 保存原型数量
+            self.n_proto = leiden_info['n_proto']
+            
+            # Layer 1: 图引导注意力
+            self.layer1 = GraphGuidedAttention(
+                dim=feature_dim,
+                adjacency_matrix=leiden_info['feature_adjacency']
+            )
+            
+            # PPEG: 带空间信息
+            self.pos_layer = PrototypePPEG(
+                dim=feature_dim,
+                num_prototypes=leiden_info.get('n_proto', 400),
+                spatial_centers=leiden_info.get('spatial_centers'),
+                use_spatial_bias=True
+            )
+            
+            # Layer 2: 标准注意力
+            self.layer2 = TransLayer(dim=feature_dim)
+            
+            self.use_leiden = True
+            
+        else:
+            print("[Transformer_P] Using standard architecture")
+            
+            self.layer1 = TransLayer(dim=feature_dim)
+            self.pos_layer = PPEG(dim=feature_dim)
+            self.layer2 = TransLayer(dim=feature_dim)
+            
+            self.use_leiden = False
+            self.n_proto = None
+        
         self.norm = nn.LayerNorm(feature_dim)
-        # Decoder
 
     def forward(self, features):
-        # ---->pad
+        # features: (B, H, D)
         H = features.shape[1]
         _H, _W = int(np.ceil(np.sqrt(H))), int(np.ceil(np.sqrt(H)))
         add_length = _H * _W - H
-        h = torch.cat([features, features[:, :add_length, :]], dim=1)  # [B, N, 512]
-        # ---->cls_token
+        
+        # Pad features
+        h = torch.cat([features, features[:, :add_length, :]], dim=1)  # (B, H+pad, D)
+        
+        # Add cls_token
         B = h.shape[0]
-        cls_tokens = self.cls_token.expand(B, -1, -1).cuda()
-        h = torch.cat((cls_tokens, h), dim=1)
-        # ---->Translayer x1
-        h = self.layer1(h)  # [B, N, 512]
-        # ---->PPEG
-        h = self.pos_layer(h, _H, _W)  # [B, N, 512]
-        # ---->Translayer x2
-        h = self.layer2(h)  # [B, N, 512]
-        # ---->cls_token
+        cls_tokens = self.cls_token.expand(B, -1, -1).to(h.device)
+        h = torch.cat((cls_tokens, h), dim=1)  # (B, 1+H+pad, D)
+        
+        # 🔥 如果使用 Leiden，只对有效原型应用图注意力
+        if self.use_leiden:
+            # 分离 cls_token, 有效原型, padding
+            cls_tok = h[:, :1, :]  # (B, 1, D)
+            valid_protos = h[:, 1:self.n_proto+1, :]  # (B, n_proto, D)
+            padding = h[:, self.n_proto+1:, :]  # (B, pad, D)
+            
+            # 只对有效原型应用图注意力
+            valid_with_cls = torch.cat([cls_tok, valid_protos], dim=1)
+            valid_attended = self.layer1(valid_with_cls)
+            
+            # 重新组合（padding 不经过图注意力）
+            h = torch.cat([valid_attended, padding], dim=1)
+        else:
+            # 标准路径
+            h = self.layer1(h)
+        
+        # PPEG
+        h = self.pos_layer(h, _H, _W)
+        
+        # Layer 2
+        h = self.layer2(h)
+        
+        # Normalization
         h = self.norm(h)
+        
         return h[:, 0], h[:, 1:]
 
 
