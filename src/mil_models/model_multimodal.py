@@ -144,7 +144,8 @@ class coattn(nn.Module):
             mult=1,
             net_indiv=False,
             numOfproto=16,
-            proto_path=None):
+            proto_path=None, 
+            transformer_config=None):
         """
         The central co-attention module where you can do it all!
 
@@ -290,9 +291,8 @@ class coattn(nn.Module):
             nn.Linear(128, self.num_classes)
         )
         
-        # 🔥 修改：直接使用 proto_path（不使用 args）
+        # 加载Leiden信息
         leiden_info = None
-
         if proto_path is not None:
             try:
                 from utils.file_utils import load_pkl
@@ -307,11 +307,19 @@ class coattn(nn.Module):
                         'feature_adjacency': proto_data.get('feature_adjacency'),
                         'spatial_centers': proto_data.get('spatial_centers'),
                         'spatial_adjacency': proto_data.get('spatial_adjacency'),
+                        'spatial_spreads': proto_data.get('spatial_spreads'),
                     }
                     print(f"[MultimodalModel] ✓ Loaded Leiden info")
                     print(f"[MultimodalModel]   - n_proto: {leiden_info['n_proto']}")
                     print(f"[MultimodalModel]   - feature_adjacency: {leiden_info['feature_adjacency'].shape}")
                     print(f"[MultimodalModel]   - spatial_centers: {leiden_info['spatial_centers'].shape}")
+                    # 🔥 打印spatial_spreads信息
+                    if 'spatial_spreads' in leiden_info and leiden_info['spatial_spreads'] is not None:
+                        spreads = leiden_info['spatial_spreads']
+                        print(f"[MultimodalModel]   - spatial_spreads: {spreads.shape}, "
+                              f"range=[{spreads.min():.2f}, {spreads.max():.2f}]")
+                    else:
+                        print(f"[MultimodalModel]   - spatial_spreads: NOT FOUND")
                 else:
                     print(f"[MultimodalModel] Proto file has no Leiden info, using standard architecture")
             except Exception as e:
@@ -323,7 +331,12 @@ class coattn(nn.Module):
             print(f"[MultimodalModel] No proto_path specified, using standard architecture")
 
         # 创建Transformer（传入Leiden信息）
-        self.pathomics_encoder = Transformer_P(self.path_proj_dim, leiden_info=leiden_info)
+        # 创建Transformer_P（传入config）
+        self.pathomics_encoder = Transformer_P(
+            self.path_proj_dim,
+            leiden_info=leiden_info,
+            config=transformer_config  # ← 新增
+        )
         self.genomics_encoder = Transformer_G(self.path_proj_dim)
 
     def forward_no_loss_after(self, x_path, x_omics, return_attn=False):
