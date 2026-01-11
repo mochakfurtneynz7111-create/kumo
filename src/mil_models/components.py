@@ -27,8 +27,6 @@ from torch.nn.parameter import Parameter
 from torch.nn import Module
 from typing import Optional
 
-from .spatial_attention import SpatialAwareAttention
-
 
 
 def moore_penrose_iter_pinv(x, iters=6):
@@ -47,6 +45,180 @@ def moore_penrose_iter_pinv(x, iters=6):
         z = 0.25 * z @ (13 * I - (xz @ (15 * I - (xz @ (7 * I - xz)))))
 
     return z
+
+# src/mil_models/components.py
+# 在文件末尾，SpatialAwareAttention类之后添加：
+
+class SpatialWeightedAttention(nn.Module):
+    """
+    空间加权注意力层 - 修复版
+    
+    关键修复：
+    1. ✅ 残差连接顺序：先norm(x)再attn，最后 x + attn_out
+    2. ✅ 重要性加权：使用log而非倒数，避免极端值
+    3. ✅ 可选禁用重要性加权
+    """
+    
+    def __init__(self, dim, spatial_centers, spatial_spreads=None, heads=8, 
+                 spatial_weight=0.3, spatial_sigma=None, 
+                 use_importance_weighting=False):  # ← 默认改为False
+        super(SpatialWeightedAttention, self).__init__()
+        
+        self.dim = dim
+        self.heads = heads
+        self.head_dim = dim // heads
+        self.scale = self.head_dim ** -0.5
+        self.use_importance_weighting = use_importance_weighting
+        
+        assert dim % heads == 0, f"dim ({dim}) must be divisible by heads ({heads})"
+        
+        # QKV投影层
+        self.qkv = nn.Linear(dim, dim * 3, bias=False)
+        self.proj = nn.Linear(dim, dim)
+        
+        # ✅ LayerNorm（先归一化）
+        self.norm = nn.LayerNorm(dim)
+        
+        # === 空间相似度计算 ===
+        n_proto = spatial_centers.shape[0]
+        spatial_centers_tensor = torch.from_numpy(spatial_centers).float()
+        
+        # 计算空间欧氏距离矩阵
+        spatial_dist = torch.cdist(spatial_centers_tensor, spatial_centers_tensor)
+        
+        # 自适应确定sigma
+        if spatial_sigma is None:
+            spatial_sigma = spatial_dist.mean().item()
+            if spatial_sigma < 1e-6:
+                spatial_sigma = 1.0
+        
+        # 高斯核相似度
+        spatial_sim = torch.exp(-spatial_dist ** 2 / (2 * spatial_sigma ** 2))
+        
+        # 归一化
+        max_sim = spatial_sim.max()
+        if max_sim > 1e-6:
+            spatial_sim = spatial_sim / max_sim
+        
+        # === 🔥 原型重要性计算（修复版）===
+        if use_importance_weighting and spatial_spreads is not None:
+            spreads_tensor = torch.from_numpy(spatial_spreads).float()
+            
+            # 🔥 方法1: 使用log而非倒数（更稳定）
+            # importance = -log(spread + 1)，spread小 → log接近0 → importance高
+            proto_importance = -torch.log(spreads_tensor + 1.0)
+            
+            # 归一化到 [0, 1]
+            proto_importance = proto_importance - proto_importance.min()  # 平移到非负
+            proto_importance = proto_importance / (proto_importance.max() + 1e-6)
+            
+            # 🔥 重要性矩阵
+            importance_matrix = proto_importance.unsqueeze(0) * proto_importance.unsqueeze(1)
+            
+            # 🔥 加权空间相似度（使用加法混合而非乘法）
+            # 混合系数：0.7来自空间相似度，0.3来自重要性
+            spatial_sim_weighted = 0.7 * spatial_sim + 0.3 * importance_matrix
+            
+            print(f"[SpatialWeightedAttention] Using importance weighting (log method)")
+            print(f"  - Spread range: [{spreads_tensor.min():.2f}, {spreads_tensor.max():.2f}]")
+            print(f"  - Importance range: [{proto_importance.min():.3f}, {proto_importance.max():.3f}]")
+        else:
+            spatial_sim_weighted = spatial_sim
+            proto_importance = None
+            print(f"[SpatialWeightedAttention] NOT using importance weighting")
+        
+        # === 扩展到包含cls_token ===
+        extended_spatial = torch.zeros(n_proto + 1, n_proto + 1)
+        extended_spatial[0, :] = 1.0
+        extended_spatial[:, 0] = 1.0
+        extended_spatial[1:, 1:] = spatial_sim_weighted
+        
+        self.register_buffer('spatial_similarity', extended_spatial)
+        
+        if proto_importance is not None:
+            importance_with_cls = torch.cat([
+                torch.ones(1),
+                proto_importance
+            ])
+            self.register_buffer('proto_importance', importance_with_cls)
+        else:
+            self.proto_importance = None
+        
+        # 可学习的空间权重
+        initial_logit = self._inverse_sigmoid(spatial_weight)
+        self.spatial_weight_logit = nn.Parameter(torch.tensor(initial_logit))
+        
+        self.n_proto = n_proto
+        self.spatial_sigma = spatial_sigma
+        
+        print(f"[SpatialWeightedAttention] Initialized")
+        print(f"  - Number of prototypes: {n_proto}")
+        print(f"  - Spatial sigma: {spatial_sigma:.2f}")
+        print(f"  - Initial spatial weight: {spatial_weight:.3f}")
+        print(f"  - Attention heads: {heads}")
+    
+    @staticmethod
+    def _inverse_sigmoid(x):
+        x = np.clip(x, 1e-6, 1 - 1e-6)
+        return np.log(x / (1 - x))
+    
+    def forward(self, x):
+        """
+        ✅ 修复后的前向传播
+        顺序：norm → attn → 残差
+        """
+        B, N, D = x.shape
+        
+        # ✅ 1. 先归一化
+        x_norm = self.norm(x)
+        
+        # 2. QKV投影
+        qkv = self.qkv(x_norm)
+        qkv = qkv.reshape(B, N, 3, self.heads, self.head_dim)
+        qkv = qkv.permute(2, 0, 3, 1, 4)
+        q, k, v = qkv[0], qkv[1], qkv[2]
+        
+        # 3. 计算特征注意力分数
+        attn_feat = (q @ k.transpose(-2, -1)) * self.scale
+        
+        # 4. 构建空间注意力
+        n_valid = self.spatial_similarity.shape[0]
+        
+        if N >= n_valid:
+            spatial_attn = torch.zeros(N, N, device=x.device, dtype=x.dtype)
+            spatial_attn[:n_valid, :n_valid] = self.spatial_similarity
+            
+            if N > n_valid:
+                spatial_attn[n_valid:, n_valid:] = torch.eye(
+                    N - n_valid, device=x.device, dtype=x.dtype
+                )
+        else:
+            spatial_attn = self.spatial_similarity[:N, :N]
+        
+        # 5. 混合注意力
+        alpha = torch.sigmoid(self.spatial_weight_logit)
+        spatial_attn_expanded = spatial_attn.unsqueeze(0).unsqueeze(0)
+        attn = (1 - alpha) * attn_feat + alpha * spatial_attn_expanded
+        
+        # 6. Softmax归一化
+        attn = attn.softmax(dim=-1)
+        
+        # 7. 加权聚合
+        out = attn @ v
+        out = out.transpose(1, 2).reshape(B, N, D)
+        
+        # 8. 输出投影
+        out = self.proj(out)
+        
+        # ✅ 9. 残差连接（正确顺序）
+        return x + out  # ← 关键：x + attn_out，而非 attn_out + norm(x)
+    
+    def get_learned_weights(self):
+        alpha = torch.sigmoid(self.spatial_weight_logit).item()
+        return {
+            'spatial_weight': alpha,
+            'proto_importance': self.proto_importance if self.proto_importance is not None else None
+        }
 
 # main attention class
 class NystromAttention(nn.Module):
@@ -145,14 +317,7 @@ class NystromAttention(nn.Module):
         # eq (15) in the paper and aggregate values
 
         attn1, attn2, attn3 = map(lambda t: t.softmax(dim=-1), (sim1, sim2, sim3))
-        # attn2_inv = moore_penrose_iter_pinv(attn2, iters)
-        try:
-            # 优先使用PyTorch内置伪逆（更稳定）
-            attn2_inv = torch.linalg.pinv(attn2)
-        except RuntimeError as e:
-            # 如果伪逆失败（极少见），回退到恒等映射
-            print(f"[Warning] Pseudo-inverse failed: {e}, using identity approximation")
-            attn2_inv = attn2
+        attn2_inv = moore_penrose_iter_pinv(attn2, iters)
 
         out = (attn1 @ attn2_inv) @ (attn3 @ v)
 
@@ -240,49 +405,68 @@ class TransLayer(nn.Module):
         x = x + self.attn(self.norm(x))
         return x
 
+# src/mil_models/components.py
+
 class GraphGuidedAttention(nn.Module):
     """
-    基于Leiden邻居图的稀疏注意力
+    基于Leiden邻居图的图引导注意力
+    创新点：使用可学习的图权重增强Leiden拓扑结构
     """
-    def __init__(self, dim=512, adjacency_matrix=None, heads=8):
+    def __init__(self, dim=512, adjacency_matrix=None, heads=8, 
+                 learnable_graph=True, init_edge_weight=2.0, init_non_edge_weight=0.5):
         super(GraphGuidedAttention, self).__init__()
         
         self.heads = heads
         self.scale = (dim // heads) ** -0.5
+        self.learnable_graph = learnable_graph
         
         self.qkv = nn.Linear(dim, dim * 3, bias=False)
         self.proj = nn.Linear(dim, dim)
         
-        # 注册邻接矩阵
+        # 🔥 创新点：可学习的图权重
         if adjacency_matrix is not None:
             n_proto = adjacency_matrix.shape[0]
             
-            # 🔥 创建扩展矩阵以包含 cls_token
+            # 扩展邻接矩阵（包含cls_token）
             extended_adj = np.zeros((n_proto + 1, n_proto + 1))
-            
-            # cls_token (索引0) 与所有token全连接
             extended_adj[0, :] = 1
             extended_adj[:, 0] = 1
-            
-            # 原型部分使用 Leiden 图 + 自环
             proto_adj_with_self = adjacency_matrix + np.eye(n_proto)
             extended_adj[1:, 1:] = proto_adj_with_self
             
-            self.register_buffer('attn_mask', 
-                               torch.from_numpy(extended_adj).float())
+            if learnable_graph:
+                # 🔥 可学习版本：边和非边都有初始权重
+                # 边 → init_edge_weight (例如2.0)
+                # 非边 → init_non_edge_weight (例如0.5)
+                init_weights = np.where(
+                    extended_adj > 0,
+                    init_edge_weight,      # Leiden邻居：初始权重高
+                    init_non_edge_weight   # 非邻居：初始权重低但非零
+                )
+                
+                # 🔥 注册为可学习参数
+                self.graph_weights = nn.Parameter(
+                    torch.from_numpy(init_weights).float()
+                )
+                
+                print(f"[GraphGuidedAttention] LEARNABLE graph weights")
+                print(f"  - Edges init: {init_edge_weight}")
+                print(f"  - Non-edges init: {init_non_edge_weight}")
+                print(f"  - Total parameters: {(n_proto+1)**2}")
+            else:
+                # 固定版本（当前实现）
+                self.register_buffer('graph_weights', 
+                                   torch.from_numpy(extended_adj).float())
+                print(f"[GraphGuidedAttention] FIXED graph mask")
             
-            print(f"[GraphGuidedAttention] Original graph: {n_proto} nodes, "
+            print(f"[GraphGuidedAttention] Graph: {n_proto} nodes, "
                   f"{adjacency_matrix.sum():.0f} edges")
-            print(f"[GraphGuidedAttention] Extended mask shape: {extended_adj.shape} "
-                  f"(includes cls_token)")
         else:
-            self.attn_mask = None
-            print(f"[GraphGuidedAttention] No graph mask, using full attention")
+            self.graph_weights = None
         
         self.norm = nn.LayerNorm(dim)
     
     def forward(self, x):
-        # x: (B, N, D) where N = 1 + n_proto (包含cls_token)
         B, N, D = x.shape
         
         qkv = self.qkv(x).reshape(B, N, 3, self.heads, D // self.heads)
@@ -290,19 +474,20 @@ class GraphGuidedAttention(nn.Module):
         q, k, v = qkv[0], qkv[1], qkv[2]
         
         # 计算注意力分数
-        attn = (q @ k.transpose(-2, -1)) * self.scale  # (B, heads, N, N)
+        attn = (q @ k.transpose(-2, -1)) * self.scale
         
-        # 应用图mask
-        if self.attn_mask is not None:
-            if self.attn_mask.shape[0] != N:
-                raise ValueError(
-                    f"Mask shape {self.attn_mask.shape} doesn't match "
-                    f"sequence length {N}. Expected {(N, N)}"
-                )
+        # 🔥 应用可学习的图权重
+        if self.graph_weights is not None:
+            # 使用softplus确保权重为正
+            # softplus(x) = log(1 + e^x)，平滑且总是>0
+            graph_mask = torch.nn.functional.softplus(self.graph_weights)
             
-            # 扩展mask到 batch 和 heads 维度
-            mask = self.attn_mask.unsqueeze(0).unsqueeze(0)  # (1, 1, N, N)
-            attn = attn.masked_fill(mask == 0, float('-inf'))
+            # 扩展到 batch 和 heads 维度
+            graph_mask = graph_mask.unsqueeze(0).unsqueeze(0)  # (1, 1, N, N)
+            
+            # 🔥 乘法mask（而非masked_fill）
+            # 这样梯度可以流动，模型可以学习调整
+            attn = attn * graph_mask
         
         attn = attn.softmax(dim=-1)
         
@@ -393,114 +578,127 @@ class PrototypePPEG(nn.Module):
         # 重新拼接 cls token
         x = torch.cat((cls_token.unsqueeze(1), x_pos), dim=1)
         return x
-
+  
+    
 class Transformer_P(nn.Module):
-    def __init__(self, feature_dim=512, leiden_info=None):
+    def __init__(self, feature_dim=512, leiden_info=None, config=None):
         super(Transformer_P, self).__init__()
         
         self.cls_token = nn.Parameter(torch.randn(1, 1, feature_dim))
         nn.init.normal_(self.cls_token, std=1e-6)
         
-        # 判断是否使用Leiden引导
-        if leiden_info is not None and 'feature_adjacency' in leiden_info:
-            print("[Transformer_P] Using Leiden-guided architecture")
-            
-            # 🔥 保存原型数量
-            self.n_proto = leiden_info['n_proto']
-            
-            # Layer 1: 图引导注意力
+        # 默认配置（全部禁用）
+        if config is None:
+            config = {}
+        
+        use_graph_attn = config.get('use_graph_attn', False)
+        use_spatial_ppeg = config.get('use_spatial_ppeg', False)
+        use_spatial_attn = config.get('use_spatial_attn', False)
+        
+        # 提取Leiden信息
+        if leiden_info is not None:
+            self.n_proto = leiden_info.get('n_proto')
+            feature_adj = leiden_info.get('feature_adjacency')
+            spatial_centers = leiden_info.get('spatial_centers')
+        else:
+            self.n_proto = None
+            feature_adj = None
+            spatial_centers = None
+        
+        # Layer 1
+        if use_graph_attn and feature_adj is not None:
+            """
+            # 在Transformer_P中
             self.layer1 = GraphGuidedAttention(
                 dim=feature_dim,
-                adjacency_matrix=leiden_info['feature_adjacency']
+                adjacency_matrix=leiden_info['feature_adjacency'],
+                learnable_graph=True,        # ← 启用可学习
+                init_edge_weight=2.0,        # Leiden邻居初始权重
+                init_non_edge_weight=0.5     # 非邻居初始权重
             )
-            
-            # PPEG: 带空间信息
+            """
+            self.layer1 = TransLayer(dim=feature_dim)
+            self.use_leiden = True
+        else:
+            self.layer1 = TransLayer(dim=feature_dim)
+            self.use_leiden = False
+        
+        # PPEG
+        if use_spatial_ppeg and spatial_centers is not None:
             self.pos_layer = PrototypePPEG(
                 dim=feature_dim,
-                num_prototypes=leiden_info.get('n_proto', 400),
-                spatial_centers=leiden_info.get('spatial_centers'),
+                num_prototypes=leiden_info['n_proto'],
+                spatial_centers=leiden_info['spatial_centers'],
                 use_spatial_bias=True
             )
-            
-            # Layer 2: 标准注意力
-            # self.layer2 = TransLayer(dim=feature_dim)
-            # ✅ Layer 2: 空间感知注意力
-            self.layer2 = SpatialAwareAttention(
+        elif spatial_centers is not None:
+            # 有spatial_centers但不用
+            self.pos_layer = PrototypePPEG(
+                dim=feature_dim,
+                num_prototypes=self.n_proto,
+                spatial_centers=spatial_centers,
+                use_spatial_bias=False
+            )
+        else:
+            self.pos_layer = PPEG(dim=feature_dim)
+        
+        # Layer 2
+        if use_spatial_attn and spatial_centers is not None:
+            self.layer2 = SpatialWeightedAttention(
                 dim=feature_dim,
                 spatial_centers=leiden_info['spatial_centers'],
-                heads=8,
-                spatial_weight=0.3
+                heads=8
             )
-            
-            self.use_leiden = True
-            
         else:
-            print("[Transformer_P] Using standard architecture")
-            
-            self.layer1 = TransLayer(dim=feature_dim)
-            self.pos_layer = PPEG(dim=feature_dim)
             self.layer2 = TransLayer(dim=feature_dim)
-            
-            self.use_leiden = False
-            self.n_proto = None
         
         self.norm = nn.LayerNorm(feature_dim)
+        
+        # 打印配置
+        print(f"[Transformer_P] Config: graph={use_graph_attn}, "
+              f"spatial_ppeg={use_spatial_ppeg}, spatial_attn={use_spatial_attn}")
 
     def forward(self, features):
-        # features: (B, n_proto, D) = (B, 16, 256)
-        
-        # === Step 1: 加cls_token（不padding）===
-        B = features.shape[0]
-        cls_tokens = self.cls_token.expand(B, -1, -1).to(features.device)
-        h = torch.cat((cls_tokens, features), dim=1)
-        # h: (B, 1+16, D) = (B, 17, D)
-        
-        # === Step 2: Layer1（图注意力）===
-        if self.use_leiden:
-            h = self.layer1(h)  # (B, 17, D) → (B, 17, D)
-            # ✓ mask是(17, 17)，输入是(B, 17, D)，完美匹配
-        else:
-            h = self.layer1(h)
-        
-        # === Step 3: Padding for PPEG ===
-        # 现在才padding
-        H = h.shape[1] - 1  # 16（去掉cls）
+        # features: (B, H, D)
+        H = features.shape[1]
         _H, _W = int(np.ceil(np.sqrt(H))), int(np.ceil(np.sqrt(H)))
         add_length = _H * _W - H
         
-        if add_length > 0:
-            cls_tok = h[:, :1, :]
-            feat_tok = h[:, 1:, :]
-            padding = feat_tok[:, :add_length, :]  # 复制前几个
-            
-            h = torch.cat([cls_tok, feat_tok, padding], dim=1)
-        # h: (B, 1+25, D) = (B, 26, D)
+        # Pad features
+        h = torch.cat([features, features[:, :add_length, :]], dim=1)  # (B, H+pad, D)
         
-        # === Step 4: PPEG ===
-        h = self.pos_layer(h, _H, _W)
-        # ✓ 输入(B, 26, D)，PPEG处理正常
+        # Add cls_token
+        B = h.shape[0]
+        cls_tokens = self.cls_token.expand(B, -1, -1).to(h.device)
+        h = torch.cat((cls_tokens, h), dim=1)  # (B, 1+H+pad, D)
         
-        # === Step 5: Layer2（空间注意力）===
-        # 🔥 关键：只对前17个应用空间注意力
+        # 🔥 如果使用 Leiden，只对有效原型应用图注意力
         if self.use_leiden:
-            cls_tok = h[:, :1, :]
-            valid_protos = h[:, 1:self.n_proto+1, :]  # 前16个
-            padding = h[:, self.n_proto+1:, :]
+            # 分离 cls_token, 有效原型, padding
+            cls_tok = h[:, :1, :]  # (B, 1, D)
+            valid_protos = h[:, 1:self.n_proto+1, :]  # (B, n_proto, D)
+            padding = h[:, self.n_proto+1:, :]  # (B, pad, D)
             
-            # 只对valid部分应用空间注意力
+            # 只对有效原型应用图注意力
             valid_with_cls = torch.cat([cls_tok, valid_protos], dim=1)
-            valid_attended = self.layer2(valid_with_cls)  # (B, 17, D)
+            valid_attended = self.layer1(valid_with_cls)
             
-            # 重新拼接
+            # 重新组合（padding 不经过图注意力）
             h = torch.cat([valid_attended, padding], dim=1)
         else:
-            h = self.layer2(h)
+            # 标准路径
+            h = self.layer1(h)
         
-        # === Step 6: Normalization ===
+        # PPEG
+        h = self.pos_layer(h, _H, _W)
+        
+        # Layer 2
+        h = self.layer2(h)
+        
+        # Normalization
         h = self.norm(h)
         
-        # 返回cls和features（不包含padding）
-        return h[:, 0], h[:, 1:self.n_proto+1]  # 只返回有效的16个
+        return h[:, 0], h[:, 1:]
 
 
 class Transformer_G(nn.Module):
