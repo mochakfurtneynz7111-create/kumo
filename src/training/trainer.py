@@ -39,7 +39,7 @@ def train(datasets, args):
     if not os.path.isdir(writer_dir):
         os.mkdir(writer_dir)
 
-    assert args.es_metric == 'loss'
+    assert args.es_metric in ['loss', 'c_index']
     
     if args.loss_fn == 'nll':
         loss_fn = NLLSurvLoss(alpha=args.nll_alpha)
@@ -83,8 +83,15 @@ def train(datasets, args):
         omic_sizes = datasets['train'].dataset.omic_sizes
     else:
         omic_sizes = []
+        
+    # 创建模型时
+    transformer_config = {
+        'use_graph_attn': args.use_graph_attn,
+        'use_spatial_ppeg': args.use_spatial_ppeg,
+        'use_spatial_attn': args.use_spatial_attn
+    }
 
-    model = create_multimodal_survival_model(args, omic_sizes=omic_sizes)
+    model = create_multimodal_survival_model(args, omic_sizes=omic_sizes,transformer_config=transformer_config)
 
     model.to(device)
     
@@ -133,11 +140,14 @@ def train(datasets, args):
 
             ### Check Early Stopping (Optional)
             if early_stopper is not None:
+                # ✅ 支持 c_index
                 if args.es_metric == 'loss':
                     score = val_results['loss']
-
+                elif args.es_metric == 'c_index':
+                    score = val_results['c_index']  # 🔥 添加这个分支
                 else:
                     raise NotImplementedError
+                    
                 save_ckpt_kwargs = dict(config=vars(args),
                                         epoch=epoch,
                                         model=model,
@@ -317,13 +327,15 @@ def validate_survival(model, loader,
     results.update({'c_index': c_index})
     print(results)
 
+    """
     if recompute_loss_at_end and isinstance(loss_fn, CoxLoss):
         surv_loss_dict = loss_fn(logits=torch.tensor(all_risk_scores).unsqueeze(1),
                                  times=torch.tensor(all_event_times).unsqueeze(1),
                                  censorships=torch.tensor(all_censorships).unsqueeze(1))
         results['surv_loss'] = surv_loss_dict['loss'].item()
         results.update({k: v.item() for k, v in surv_loss_dict.items() if isinstance(v, torch.Tensor)})
-
+    """
+    
     if verbose:
         msg = [f"{k}: {v:.3f}" for k, v in results.items()]
         print("\t".join(msg))
