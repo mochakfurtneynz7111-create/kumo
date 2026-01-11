@@ -145,7 +145,14 @@ class NystromAttention(nn.Module):
         # eq (15) in the paper and aggregate values
 
         attn1, attn2, attn3 = map(lambda t: t.softmax(dim=-1), (sim1, sim2, sim3))
-        attn2_inv = moore_penrose_iter_pinv(attn2, iters)
+        # attn2_inv = moore_penrose_iter_pinv(attn2, iters)
+        try:
+            # 优先使用PyTorch内置伪逆（更稳定）
+            attn2_inv = torch.linalg.pinv(attn2)
+        except RuntimeError as e:
+            # 如果伪逆失败（极少见），回退到恒等映射
+            print(f"[Warning] Pseudo-inverse failed: {e}, using identity approximation")
+            attn2_inv = attn2
 
         out = (attn1 @ attn2_inv) @ (attn3 @ v)
 
@@ -440,46 +447,60 @@ class Transformer_P(nn.Module):
         self.norm = nn.LayerNorm(feature_dim)
 
     def forward(self, features):
-        # features: (B, H, D)
-        H = features.shape[1]
+        # features: (B, n_proto, D) = (B, 16, 256)
+        
+        # === Step 1: 加cls_token（不padding）===
+        B = features.shape[0]
+        cls_tokens = self.cls_token.expand(B, -1, -1).to(features.device)
+        h = torch.cat((cls_tokens, features), dim=1)
+        # h: (B, 1+16, D) = (B, 17, D)
+        
+        # === Step 2: Layer1（图注意力）===
+        if self.use_leiden:
+            h = self.layer1(h)  # (B, 17, D) → (B, 17, D)
+            # ✓ mask是(17, 17)，输入是(B, 17, D)，完美匹配
+        else:
+            h = self.layer1(h)
+        
+        # === Step 3: Padding for PPEG ===
+        # 现在才padding
+        H = h.shape[1] - 1  # 16（去掉cls）
         _H, _W = int(np.ceil(np.sqrt(H))), int(np.ceil(np.sqrt(H)))
         add_length = _H * _W - H
         
-        # Pad features
-        h = torch.cat([features, features[:, :add_length, :]], dim=1)  # (B, H+pad, D)
+        if add_length > 0:
+            cls_tok = h[:, :1, :]
+            feat_tok = h[:, 1:, :]
+            padding = feat_tok[:, :add_length, :]  # 复制前几个
+            
+            h = torch.cat([cls_tok, feat_tok, padding], dim=1)
+        # h: (B, 1+25, D) = (B, 26, D)
         
-        # Add cls_token
-        B = h.shape[0]
-        cls_tokens = self.cls_token.expand(B, -1, -1).to(h.device)
-        h = torch.cat((cls_tokens, h), dim=1)  # (B, 1+H+pad, D)
+        # === Step 4: PPEG ===
+        h = self.pos_layer(h, _H, _W)
+        # ✓ 输入(B, 26, D)，PPEG处理正常
         
-        # 🔥 如果使用 Leiden，只对有效原型应用图注意力
+        # === Step 5: Layer2（空间注意力）===
+        # 🔥 关键：只对前17个应用空间注意力
         if self.use_leiden:
-            # 分离 cls_token, 有效原型, padding
-            cls_tok = h[:, :1, :]  # (B, 1, D)
-            valid_protos = h[:, 1:self.n_proto+1, :]  # (B, n_proto, D)
-            padding = h[:, self.n_proto+1:, :]  # (B, pad, D)
+            cls_tok = h[:, :1, :]
+            valid_protos = h[:, 1:self.n_proto+1, :]  # 前16个
+            padding = h[:, self.n_proto+1:, :]
             
-            # 只对有效原型应用图注意力
+            # 只对valid部分应用空间注意力
             valid_with_cls = torch.cat([cls_tok, valid_protos], dim=1)
-            valid_attended = self.layer1(valid_with_cls)
+            valid_attended = self.layer2(valid_with_cls)  # (B, 17, D)
             
-            # 重新组合（padding 不经过图注意力）
+            # 重新拼接
             h = torch.cat([valid_attended, padding], dim=1)
         else:
-            # 标准路径
-            h = self.layer1(h)
+            h = self.layer2(h)
         
-        # PPEG
-        h = self.pos_layer(h, _H, _W)
-        
-        # Layer 2
-        h = self.layer2(h)
-        
-        # Normalization
+        # === Step 6: Normalization ===
         h = self.norm(h)
         
-        return h[:, 0], h[:, 1:]
+        # 返回cls和features（不包含padding）
+        return h[:, 0], h[:, 1:self.n_proto+1]  # 只返回有效的16个
 
 
 class Transformer_G(nn.Module):
