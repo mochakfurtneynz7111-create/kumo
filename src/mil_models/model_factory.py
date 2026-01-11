@@ -61,7 +61,7 @@ def create_embedding_model(args, mode='classification', config_dir='./configs'):
     return model
 
 
-def create_multimodal_survival_model(args, omic_sizes=[]):
+def create_multimodal_survival_model(args, omic_sizes=[],transformer_config=None):
     if args.loss_fn == 'nll':
         num_classes = args.n_label_bins
     elif args.loss_fn == 'cox':
@@ -90,7 +90,8 @@ def create_multimodal_survival_model(args, omic_sizes=[]):
             histo_model=args.model_histo_type,
             append_embed=args.append_embed,
             net_indiv=args.net_indiv,
-            proto_path=proto_path  # 🔥 新增：传递 proto_path
+            proto_path=proto_path, # 🔥 新增：传递 proto_path
+            transformer_config=transformer_config
         )
 
     elif args.model_mm_type == 'survpath':
