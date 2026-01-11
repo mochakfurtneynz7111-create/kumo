@@ -244,23 +244,40 @@ def get_lr_scheduler(args, optimizer, dataloader):
     return lr_scheduler
 
 
-def get_optim(args, model=None, parameters=None):
-    def exclude(
-        n, p): return p.ndim < 2 or "bn" in n or "ln" in n or "bias" in n or 'logit_scale' in n
+import torch.optim as optim
 
-    def include(n, p): return not exclude(n, p)
+def get_optim(args, model=None, parameters=None):
+    """
+    修复版本的优化器初始化函数
+    
+    关键修复：
+    1. 在 AdamW/SGD/RAdam 初始化时不传入顶层 weight_decay
+    2. 完全依赖 parameter groups 中的 weight_decay 设置
+    3. 添加调试信息打印
+    """
+    def exclude(n, p): 
+        return p.ndim < 2 or "bn" in n or "ln" in n or "bias" in n or 'logit_scale' in n
+
+    def include(n, p): 
+        return not exclude(n, p)
 
     if parameters is None:
         named_parameters = list(model.named_parameters())
-        gain_or_bias_params = [
-            p for n, p in named_parameters if exclude(n, p) and p.requires_grad]
-        rest_params = [p for n, p in named_parameters if include(
-            n, p) and p.requires_grad]
+        gain_or_bias_params = [p for n, p in named_parameters if exclude(n, p) and p.requires_grad]
+        rest_params = [p for n, p in named_parameters if include(n, p) and p.requires_grad]
+        
         parameters = [
-            {"params": gain_or_bias_params, "weight_decay": 0.},
+            {"params": gain_or_bias_params, "weight_decay": 0.0},
             {"params": rest_params, "weight_decay": args.wd},
         ]
+        
+        print(f"\n{'='*60}")
+        print(f"Optimizer Configuration:")
+        print(f"  - Bias/BN params (no decay): {len(gain_or_bias_params)} parameters")
+        print(f"  - Rest params (decay={args.wd}): {len(rest_params)} parameters")
+        print(f"{'='*60}\n")
 
+    # 关键修复：不在这里传入 weight_decay，完全依赖 parameter groups
     if args.opt == "adamW":
         optimizer = optim.AdamW(parameters, lr=args.lr)
     elif args.opt == 'sgd':
@@ -269,6 +286,18 @@ def get_optim(args, model=None, parameters=None):
         optimizer = optim.RAdam(parameters, lr=args.lr)
     else:
         raise NotImplementedError
+    
+    # 调试：打印优化器的实际配置
+    print(f"\n{'='*60}")
+    print(f"Optimizer Initialized: {args.opt}")
+    print(f"Learning rate: {args.lr}")
+    for i, param_group in enumerate(optimizer.param_groups):
+        print(f"  Param group {i}:")
+        print(f"    - lr: {param_group['lr']}")
+        print(f"    - weight_decay: {param_group['weight_decay']}")
+        print(f"    - num_params: {len(param_group['params'])}")
+    print(f"{'='*60}\n")
+    
     return optimizer
  
 
