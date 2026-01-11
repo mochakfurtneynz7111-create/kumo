@@ -14,8 +14,15 @@ import torch
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+"""
+修复后的proto_utils.py关键部分
+主要修改:
+1. n_neighbors: 15 → 250
+2. n_pcs: 50 → 全部 (min(n_samples-1, feature_dim-1))
+"""
+
 def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000, 
-                   resolution=1.0, n_neighbors=15, use_cuda=False):
+                   resolution=1.0, n_neighbors=250, use_cuda=False):  # 🔴 改15→250
     """
     Leiden聚类自动确定原型数量 + 保存空间信息
     """
@@ -33,17 +40,15 @@ def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000,
     print(f"[Leiden] Sampling maximum of {n_total} patches: {n_patches_per_batch} each from {len(data_loader)}")
     
     patches = torch.Tensor(n_total, feature_dim)
+    patch_coords = torch.Tensor(n_total, 2)
     
-    # 🔥 新增：存储每个patch的空间坐标
-    patch_coords = torch.Tensor(n_total, 2)  # (x, y)
-    
-    # === 采样patches和坐标 ===
+    # 采样patches和坐标
     for batch in tqdm(data_loader):
         if n_patches >= n_total:
             continue
         
         data = batch['img']
-        coords = batch.get('coords', None)  # 尝试获取坐标
+        coords = batch.get('coords', None)
         
         with torch.no_grad():
             data_reshaped = data.reshape(-1, data.shape[-1])
@@ -57,14 +62,11 @@ def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000,
         
         patches[n_patches: n_patches + size] = out
         
-        # 🔥 新增：保存对应的坐标
         if coords is not None:
             coords_reshaped = coords.reshape(-1, 2)
-            # 使用相同的shuffle和slice
             sampled_coords = coords_reshaped[:n_patches_per_batch][:size]
             patch_coords[n_patches: n_patches + size] = sampled_coords
         else:
-            # 如果没有坐标，使用假坐标（顺序索引）
             fake_coords = torch.arange(n_patches, n_patches + size).unsqueeze(1).repeat(1, 2).float()
             patch_coords[n_patches: n_patches + size] = fake_coords
         
@@ -79,11 +81,15 @@ def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000,
     
     adata = anndata.AnnData(X=patches[:n_patches].cpu().numpy())
     
+    # 🔴 修改: 使用所有PCA成分
     print("[Leiden] Computing PCA...")
-    sc.tl.pca(adata, svd_solver='arpack', n_comps=min(50, feature_dim-1))
+    n_pca_comps = min(adata.X.shape[0] - 1, feature_dim - 1)
+    print(f"[Leiden] Using {n_pca_comps} PCA components (HPL uses all available)")
+    sc.tl.pca(adata, svd_solver='arpack', n_comps=n_pca_comps)  # ✅ 全部
     
-    print("[Leiden] Computing neighbors...")
-    sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=50, 
+    # 🔴 修改: 使用所有PCA成分构建邻居图
+    print(f"[Leiden] Computing neighbors with n_neighbors={n_neighbors}, n_pcs={n_pca_comps}...")
+    sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pca_comps,  # ✅ 正确
                    method='umap', metric='euclidean')
     
     print("[Leiden] Running Leiden algorithm...")
@@ -94,7 +100,7 @@ def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000,
     
     print(f"[Leiden] ✓ Automatically determined {n_proto} prototypes!")
     
-    # === 计算原型中心（特征和空间） ===
+    # 计算原型中心
     centroids = []
     proto_spatial_centers = []
     proto_spatial_spreads = []
@@ -103,41 +109,45 @@ def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000,
     for c in range(n_proto):
         mask = leiden_labels == c
         
-        # 特征中心
         cluster_patches = patches[:n_patches][mask]
         centroid = cluster_patches.mean(dim=0)
         centroids.append(centroid)
         
-        # 🔥 新增：空间中心
         cluster_coords = patch_coords[:n_patches][mask]
-        spatial_center = cluster_coords.mean(dim=0)  # (2,)
+        spatial_center = cluster_coords.mean(dim=0)
         proto_spatial_centers.append(spatial_center)
         
-        # 🔥 新增：空间分散度
         spatial_spread = cluster_coords.std(dim=0).mean().item()
         proto_spatial_spreads.append(spatial_spread)
         
-        # 记录原型包含的patches索引
         proto_to_patches[c] = torch.where(torch.from_numpy(mask))[0].numpy()
     
-    centroids_matrix = torch.stack(centroids)  # (n_proto, feature_dim)
-    proto_spatial_centers = torch.stack(proto_spatial_centers)  # (n_proto, 2)
-    proto_spatial_spreads = torch.tensor(proto_spatial_spreads)  # (n_proto,)
+    centroids_matrix = torch.stack(centroids)
+    proto_spatial_centers = torch.stack(proto_spatial_centers)
+    proto_spatial_spreads = torch.tensor(proto_spatial_spreads)
     
-    # === 构建特征邻居图 ===
+    # 构建特征邻居图
     print("[Leiden] Computing prototype feature graph...")
     proto_distances = torch.cdist(centroids_matrix, centroids_matrix)
     
-    k_neighbors = min(15, n_proto - 1)
+    # k_neighbors = min(15, n_proto - 1)
+    if n_proto <= 20:
+        k_neighbors = max(3, n_proto // 5)      # 20%
+    elif n_proto <= 50:
+        k_neighbors = max(5, n_proto // 4)      # 25%  
+    else:
+        k_neighbors = min(15, n_proto // 3)     # 33%
+
+    print(f"[Leiden] k_neighbors={k_neighbors} for n_proto={n_proto}")
     _, topk_indices = proto_distances.topk(k_neighbors + 1, dim=-1, largest=False)
     
     feature_adjacency = torch.zeros(n_proto, n_proto)
     for i in range(n_proto):
-        neighbors = topk_indices[i, 1:]  # 跳过自己
+        neighbors = topk_indices[i, 1:]
         feature_adjacency[i, neighbors] = 1
-        feature_adjacency[neighbors, i] = 1  # 对称化
+        feature_adjacency[neighbors, i] = 1
     
-    # 🔥 新增：构建空间邻居图
+    # 构建空间邻居图
     print("[Leiden] Computing prototype spatial graph...")
     spatial_distances = torch.cdist(proto_spatial_centers, proto_spatial_centers)
     
@@ -150,8 +160,7 @@ def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000,
         spatial_adjacency[i, neighbors] = 1
         spatial_adjacency[neighbors, i] = 1
     
-    # === 保存权重 ===
-    weight = centroids_matrix.unsqueeze(0).numpy()  # [1, C, feature_dim]
+    weight = centroids_matrix.unsqueeze(0).numpy()
     
     e = time.time()
     print(f"[Leiden] Clustering took {e-s:.2f} seconds!")
@@ -160,7 +169,6 @@ def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000,
     print(f"[Leiden] Spatial graph edges: {spatial_adjacency.sum().item():.0f}")
     print(f"[Leiden] Spatial spread: mean={proto_spatial_spreads.mean():.2f}, std={proto_spatial_spreads.std():.2f}")
     
-    # 🔥 新增：返回完整信息字典
     extra_info = {
         'leiden_labels': leiden_labels,
         'proto_to_patches': proto_to_patches,
@@ -170,36 +178,24 @@ def cluster_leiden(data_loader, feature_dim=1024, n_proto_patches=50000,
         'spatial_adjacency': spatial_adjacency.numpy(),
         'leiden_resolution': resolution,
         'leiden_neighbors': n_neighbors,
-        'patch_coords': patch_coords[:n_patches].numpy()  # 可选：保存原始坐标
+        'n_pca_components': n_pca_comps,  # 🔥 记录使用的PCA成分数
+        'patch_coords': patch_coords[:n_patches].numpy()
     }
     
-    return n_patches, weight, n_proto, extra_info  # 返回4个值
+    return n_patches, weight, n_proto, extra_info
+
 
 def cluster_leiden_HPL(data_loader, feature_dim=1024, n_proto_patches=50000, 
-                   resolution=1.0, n_neighbors=15, use_cuda=False):
+                   resolution=1.0, n_neighbors=250, use_cuda=False):  # 🔴 改15→250
     """
-    Leiden聚类自动确定原型数量
-    
-    参数说明:
-        resolution: Leiden分辨率,控制聚类粒度
-                   - 越大 → 聚类数越多 (如2.0可能产生30+个聚类)
-                   - 越小 → 聚类数越少 (如0.5可能产生8-12个聚类)
-                   - 推荐范围: 0.8-1.5
-        n_neighbors: 邻居数,用于构建KNN图
-    
-    返回:
-        n_patches: 实际采样的patch数量
-        weight: 原型中心 [1, C, feature_dim]
-        n_proto: 自动确定的原型数量
+    Leiden聚类自动确定原型数量 - 简化版
     """
     import scanpy as sc
     import anndata
-    import pandas as pd
     
     n_patches = 0
-    n_total = n_proto_patches  # 不再基于固定n_proto
+    n_total = n_proto_patches
     
-    # 采样patches
     try:
         n_patches_per_batch = (n_total + len(data_loader) - 1) // len(data_loader)
     except:
@@ -230,31 +226,27 @@ def cluster_leiden_HPL(data_loader, feature_dim=1024, n_proto_patches=50000,
     
     s = time.time()
     
-    # === Leiden聚类核心代码 ===
     print(f"\n[Leiden] Running Leiden clustering with resolution={resolution}, n_neighbors={n_neighbors}")
     
-    # 1. 创建AnnData对象
     adata = anndata.AnnData(X=patches[:n_patches].cpu().numpy())
     
-    # 2. 构建邻居图(使用PCA降维以加速)
+    # 🔴 修改: 使用所有PCA成分
     print("[Leiden] Computing PCA...")
-    sc.tl.pca(adata, svd_solver='arpack', n_comps=min(50, feature_dim-1))
+    n_pca_comps = min(adata.X.shape[0] - 1, feature_dim - 1)
+    sc.tl.pca(adata, svd_solver='arpack', n_comps=n_pca_comps)  # ✅ 全部
     
-    print("[Leiden] Computing neighbors...")
-    sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=50, 
+    print(f"[Leiden] Computing neighbors with n_neighbors={n_neighbors}, n_pcs={n_pca_comps}...")
+    sc.pp.neighbors(adata, n_neighbors=n_neighbors, n_pcs=n_pca_comps,  # ✅ 全部
                    method='umap', metric='euclidean')
     
-    # 3. Leiden聚类
     print("[Leiden] Running Leiden algorithm...")
     sc.tl.leiden(adata, resolution=resolution, key_added='leiden')
     
-    # 4. 提取聚类标签
     leiden_labels = adata.obs['leiden'].astype(int).values
-    n_proto = len(np.unique(leiden_labels))  # 自适应确定的聚类数!
+    n_proto = len(np.unique(leiden_labels))
     
     print(f"[Leiden] ✓ Automatically determined {n_proto} prototypes!")
     
-    # 5. 计算每个聚类的中心作为原型
     centroids = []
     for c in range(n_proto):
         mask = leiden_labels == c
@@ -262,25 +254,22 @@ def cluster_leiden_HPL(data_loader, feature_dim=1024, n_proto_patches=50000,
         centroid = cluster_patches.mean(dim=0)
         centroids.append(centroid)
     
-    weight = torch.stack(centroids).unsqueeze(0).numpy()  # [1, C, feature_dim]
+    weight = torch.stack(centroids).unsqueeze(0).numpy()
     
     e = time.time()
     print(f"[Leiden] Clustering took {e-s:.2f} seconds!")
     print(f"[Leiden] Cluster sizes: {[(leiden_labels==c).sum() for c in range(n_proto)]}")
     
-    return n_patches, weight, n_proto  # 注意返回3个值!
+    return n_patches, weight, n_proto
 
 
 def cluster(data_loader, n_proto, n_iter, n_init=5, feature_dim=1024, 
             n_proto_patches=50000, mode='kmeans', use_cuda=False,
-            leiden_resolution=1.0, leiden_neighbors=15):  # 新增参数
+            leiden_resolution=1.0, leiden_neighbors=250):  # 🔴 改15→250
     """
-    K-Means或Leiden clustering on embedding space
-    
-    mode: 'kmeans', 'faiss', 'leiden'
+    K-Means或Leiden clustering
     """
     
-    # === 新增: Leiden模式 ===
     if mode == 'leiden':
         return cluster_leiden(
             data_loader, 
