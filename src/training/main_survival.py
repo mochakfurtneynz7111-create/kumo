@@ -139,7 +139,7 @@ parser.add_argument('--max_epochs', type=int, default=20,
                     help='maximum number of epochs to train (default: 20)')
 parser.add_argument('--lr', type=float, default=1e-4,
                     help='learning rate')
-parser.add_argument('--wd', type=float, default=1e-5,
+parser.add_argument('--wd', type=float, default=None,
                     help='weight decay')
 parser.add_argument('--accum_steps', type=int, default=1,
                     help='grad accumulation steps')
@@ -220,6 +220,12 @@ parser.add_argument('--target_col', type=str, default='os_survival_days')
 parser.add_argument('--n_label_bins', type=int, default=4,
                     help='number of bins for event time discretization')
 
+## 消融
+parser.add_argument('--use_graph_attn', action='store_true')
+parser.add_argument('--use_spatial_ppeg', action='store_true')
+parser.add_argument('--use_spatial_attn', action='store_true')
+
+
 # dataset / split args ###
 parser.add_argument('--data_source', type=str, default=None,
                     help='manually specify the data source')
@@ -238,6 +244,8 @@ parser.add_argument('--tags', nargs='+', type=str, default=None,
 
 parser.add_argument('--wandb_project', default='mmp_final')
 args = parser.parse_args()
+
+
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
