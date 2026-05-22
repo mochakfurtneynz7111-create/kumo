@@ -1,0 +1,33 @@
+{
+  "config_save_path": "/mnt/hgfs/ShareFile/3403芯片流程整理/SVP",
+  "python_interpreter_path": "C:\\Program Files\\Python38\\python.exe",
+  "dataset_path": "C:/Users/mac/Desktop/zydevscode/FDW_demo/FDW_demo/simulate_demo/images",
+  "inference_script_path": "",
+  "calparam_script_path": "",
+  "inference_workdir": "",
+  "simulate_result": "result/simulate.json",
+  "infer_result": "result/infer.json",
+  "netron_port": "8080",
+  "chips": {
+    "3403": {
+      "name": "svp",
+      "ui_params_path": "/mnt/hgfs/ShareFile/CHIP/chip-new-ljw/chip-flow/ui_params/svp.json",
+      "preprocess": "source ~/Ascend/ascend-toolkit/svp_latest/x86_64-linux/script/setenv.sh",
+      "compile": "atc",
+      "compiletoml2cmd": 1,
+      "compile_workdir": "/mnt/hgfs/ShareFile/3403芯片流程整理/SVP",
+      "simulate": "",
+      "simulate_workdir": ""
+    },
+    "FDW": {
+      "name": "fdw",
+      "ui_params_path": "C:/Users/mac/Desktop/zydevscode/chip-flow/ui_params/fudanwei.json",
+      "preprocess": "",
+      "compile": "icraft compile",
+      "compiletoml2cmd": 0,
+      "compile_workdir": "C:/Users/mac/Desktop/zydevscode/FDW_demo/FDW_demo/compile_demo/work_dir",
+      "simulate": "yolov5_soft_sim.py",
+      "simulate_workdir": "C:/Users/mac/Desktop/zydevscode/FDW_demo/FDW_demo/simulate_demo/work_dir"
+    }
+  }
+}

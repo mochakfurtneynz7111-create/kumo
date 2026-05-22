@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.log
+config/
+/setting.json
+result/
+tmp/
+build/
+dist/
+ui/**/*_ui.py
+netron/
+.vscode/
+runs/
+script/yolov6test

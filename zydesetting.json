@@ -1,0 +1,22 @@
+{
+  "config_save_path": "C:/Users/mac/Desktop/zydevscode/tutorial3.7/tutorial3.7/examples/compile/config",
+  "python_interpreter_path": "C:\\Program Files\\Python38\\python.exe",
+  "dataset_path": "C:/Users/mac/Desktop/zydevscode/tutorial3.7/tutorial3.7/examples/Example2_quick_start_python/images",
+  "inference_script_path": "",
+  "calparam_script_path": "",
+  "inference_workdir": "",
+  "simulate_result": "result/simulate.json",
+  "netron_port": "8080",
+  "chips": {
+    "FuDanWei": {
+      "name": "100TAI111",
+      "ui_params_path": "C:/Users/mac/Desktop/zydevscode/chip-flow/ui_params/fudanwei.json",
+      "preprocess": "",
+      "compile": "icraft compile",
+      "compiletoml2cmd": 0,
+      "compile_workdir": "C:/Users/mac/Desktop/zydevscode/tutorial3.7/examples/compile",
+      "simulate": "C:/Users/mac/Desktop/zydevscode/tutorial3.7/tutorial3.7/examples/Example2_quick_start_python/yolov5_soft_sim.py",
+      "simulate_workdir": "C:/Users/mac/Desktop/zydevscode/tutorial3.7/tutorial3.7/examples/Example2_quick_start_python"
+    }
+  }
+}
