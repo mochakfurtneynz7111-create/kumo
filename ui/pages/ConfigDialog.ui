@@ -1,0 +1,3731 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConfigDialog</class>
+ <widget class="QDialog" name="ConfigDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>参数配置</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>768</width>
+        <height>1855</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QGroupBox" name="ParseGroupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>[Parse]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0" columnstretch="1,1,1,1">
+            <item row="4" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <item>
+               <widget class="QLabel" name="label_input">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>62</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>input</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="ShapeInput"/>
+              </item>
+             </layout>
+            </item>
+            <item row="6" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_21">
+              <item>
+               <widget class="QLabel" name="label_weights">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>62</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>weights</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="WeightInput"/>
+              </item>
+             </layout>
+            </item>
+            <item row="3" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLabel" name="label_framework">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>framework</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="FrameWorkComboBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="6" column="2" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_22">
+              <item>
+               <widget class="QLabel" name="label_custom_op">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>76</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>custom_op</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="CustomOpInput"/>
+              </item>
+             </layout>
+            </item>
+            <item row="3" column="3">
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <widget class="QLabel" name="label_pre_method">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>76</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>pre_method</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="PreMethodComboBox"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="2" column="0" colspan="4">
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QLabel" name="label_name">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>62</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>name</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="NameInput"/>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0" colspan="4">
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <widget class="QLabel" name="label_network">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>62</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>network</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="NetworkInput"/>
+              </item>
+              <item>
+               <widget class="QPushButton" name="ChooseNetworkButton">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>选择</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="5" column="2" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_20">
+              <item>
+               <widget class="QLabel" name="label_pre_scale">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>76</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>pre_scale</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="PreScaleInput"/>
+              </item>
+             </layout>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_19">
+              <item>
+               <widget class="QLabel" name="label_pre_mean">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>62</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>pre_mean</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="PreMeanInput"/>
+              </item>
+             </layout>
+            </item>
+            <item row="4" column="3">
+             <layout class="QHBoxLayout" name="horizontalLayout_18">
+              <item>
+               <widget class="QLabel" name="label_chann_swap">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>76</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>chann_swap</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="ChannelSwapInput"/>
+              </item>
+             </layout>
+            </item>
+            <item row="4" column="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <widget class="QLabel" name="label_input_format">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>76</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>input_format</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="InputFormatComboBox"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="3" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0">
+              <item>
+               <widget class="QLabel" name="label_frame_version">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>frame_version</string>
+                </property>
+                <property name="textFormat">
+                 <enum>Qt::TextFormat::AutoText</enum>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="FrameVersionComboBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="3" column="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QLabel" name="label_post_method">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>76</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>post_method</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="PostMethodComboBox"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="OptimizeGroupBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>[Optimize]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="sizeConstraint">
+           <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="1,1,2">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <item>
+               <widget class="QLabel" name="label_debug">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>debug</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="DebugCheckBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_34">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <item>
+               <widget class="QLabel" name="label_target">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>target</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="TargetComboBox"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_35">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>26</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QToolButton" name="OptimizeOptionToolButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="tabletTracking">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"> QToolButton {
+                text-align: center;  /* 使文本居中 */
+                padding-right: 16px;  /* 确保箭头和文本有适当的间距 */
+            }</string>
+            </property>
+            <property name="text">
+             <string>可选</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+            <property name="arrowType">
+             <enum>Qt::ArrowType::RightArrow</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="OptimizeOptionGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="title">
+             <string>可选</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                 <item>
+                  <widget class="QLabel" name="label_customop_config">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>117</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>customop_config</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="CustomopConfigOpInput"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_13">
+                 <item>
+                  <widget class="QLabel" name="label_config">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>117</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>config</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="ConfigInput"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_17">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_14">
+                   <item>
+                    <widget class="QLabel" name="label_customop_on">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>117</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>customop_on</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="CustomOpOnInput"/>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_15">
+                   <item>
+                    <widget class="QLabel" name="label_pass_on">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>75</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>pass_on</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="PassOnInput"/>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_16">
+                   <item>
+                    <widget class="QLabel" name="label_pass_off">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>75</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>pass_off</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="PassOffInput"/>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="QuantizeGoupBox">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>[Quantize]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,1,1,1">
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="horizontalSpacing">
+             <number>6</number>
+            </property>
+            <item row="2" column="0" colspan="4">
+             <layout class="QHBoxLayout" name="horizontalLayout_25">
+              <item>
+               <widget class="QLabel" name="label_forward_list">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>82</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>forward_list</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="ForwardListLineEdit"/>
+              </item>
+             </layout>
+            </item>
+            <item row="0" column="2">
+             <layout class="QHBoxLayout" name="horizontalLayout_28">
+              <item>
+               <widget class="QLabel" name="label_bits">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>82</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>bits</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="BitsComboBox"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_10">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="0" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout_27">
+              <item>
+               <widget class="QLabel" name="label_per">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>82</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>per</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="PerComboBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_9">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="1" column="0" colspan="4">
+             <layout class="QHBoxLayout" name="horizontalLayout_24">
+              <item>
+               <widget class="QLabel" name="label_forward_dir">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>82</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>forward_dir</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="ForwardDirLineEdit">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="0" column="3">
+             <layout class="QHBoxLayout" name="horizontalLayout_29">
+              <item>
+               <widget class="QLabel" name="label_saturation">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>82</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>saturation</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="SaturationComboBox"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_11">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item row="0" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_26">
+              <item>
+               <widget class="QLabel" name="label_forward_mode">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>82</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>forward
+mode</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="ForwardModeComboBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QToolButton" name="QuantizeOptionToolButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="tabletTracking">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"> QToolButton {
+                text-align: center;  /* 使文本居中 */
+                padding-right: 16px;  /* 确保箭头和文本有适当的间距 */
+            }</string>
+            </property>
+            <property name="text">
+             <string>可选</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+            <property name="arrowType">
+             <enum>Qt::ArrowType::RightArrow</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="QuantizeOptionGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>可选</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <item>
+              <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,1,1,1" columnminimumwidth="0,0,0,0">
+               <item row="0" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_30">
+                 <item>
+                  <widget class="QLabel" name="label_batch">
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>batch</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="BatchLineEdit"/>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_34">
+                 <item>
+                  <widget class="QLabel" name="label_no_transinput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>no_transinput</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="NoTransinputcheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_37">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item row="0" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_31">
+                 <item>
+                  <widget class="QLabel" name="label_bin_num">
+                   <property name="minimumSize">
+                    <size>
+                     <width>75</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>bin_num</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="BinNumLineEdit"/>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="2">
+                <layout class="QHBoxLayout" name="horizontalLayout_35">
+                 <item>
+                  <widget class="QLabel" name="label_before_relu">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>before_relu</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="BeforeReluCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                   <property name="tristate">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_38">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_33">
+                 <item>
+                  <widget class="QLabel" name="label_only_norm">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>only_norm</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="OnlyNormcheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_36">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="3">
+                <layout class="QHBoxLayout" name="horizontalLayout_36">
+                 <item>
+                  <widget class="QLabel" name="label_verbose">
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>verbose</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="VerboseCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                   <property name="tristate">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_39">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item row="0" column="2">
+                <layout class="QHBoxLayout" name="horizontalLayout_32">
+                 <item>
+                  <widget class="QLabel" name="label_dump_ftmp">
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>dump_ftmp</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="DumpFtmpCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LayoutDirection::LeftToRight</enum>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                   <property name="tristate">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_40">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_37">
+               <item>
+                <widget class="QLabel" name="label_names_file">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>names_file</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="NamesFileLineEdit"/>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_38">
+               <item>
+                <widget class="QLabel" name="label_ftmp_csv">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>ftmp_csv</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="FtmpCsvLineEdit"/>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_39">
+               <item>
+                <widget class="QLabel" name="label_raw_csv">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>raw_csv</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="RawCsvLineEdit"/>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_40">
+               <item>
+                <widget class="QLabel" name="label_decode_dll">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>decode_dll</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="DecodeDllLineEdit"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="AdaptTargetGroupBox">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string notr="true">[Adapt]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_43" stretch="1,1,2">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_41">
+              <item>
+               <widget class="QLabel" name="label_adapt_target">
+                <property name="text">
+                 <string>target</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="AdaptTargetComboBox"/>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_19">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_42">
+              <item>
+               <widget class="QLabel" name="label_adapt_debug">
+                <property name="text">
+                 <string>debug</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="AdaptDebugCheckBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QToolButton" name="AdaptOptionToolButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="tabletTracking">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"> QToolButton {
+                text-align: center;  /* 使文本居中 */
+                padding-right: 16px;  /* 确保箭头和文本有适当的间距 */
+            }</string>
+            </property>
+            <property name="text">
+             <string>可选</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+            <property name="arrowType">
+             <enum>Qt::ArrowType::RightArrow</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="AdaptOptionGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>可选</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_9">
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_44">
+               <item>
+                <widget class="QLabel" name="label_adapt_customop">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>117</width>
+                   <height>26</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>customop_config</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="AdaptCustomOpInput">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>26</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_53">
+               <item>
+                <widget class="QLabel" name="label_adapt_config">
+                 <property name="minimumSize">
+                  <size>
+                   <width>117</width>
+                   <height>26</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>config</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="AdaptConfigLineEdit">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>26</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_45">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_46">
+                 <item>
+                  <widget class="QLabel" name="label_adapt_customop_on">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>117</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>customop_on</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="AdaptCustomOpOnInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_47">
+                 <item>
+                  <widget class="QLabel" name="label_adapt_pass_on">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>75</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>pass_on</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="AdaptPassOnInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_48">
+                 <item>
+                  <widget class="QLabel" name="label_adapt_pass_off">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>75</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>pass_off</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="AdaptPassOffInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="GenerateGroupBox">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>[Generate]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_12">
+          <item>
+           <widget class="QToolButton" name="GenerateOptionToolButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="tabletTracking">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"> QToolButton {
+                text-align: center;  /* 使文本居中 */
+                padding-right: 16px;  /* 确保箭头和文本有适当的间距 */
+            }</string>
+            </property>
+            <property name="text">
+             <string>可选</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+            <property name="arrowType">
+             <enum>Qt::ArrowType::RightArrow</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="GenerateOptionGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>可选</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_11">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_49">
+               <item>
+                <widget class="QLabel" name="label_generate_ddr_base">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>26</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>ddr_base</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="GenerateDDRBaseInput">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>26</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_58">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_50">
+                 <item>
+                  <widget class="QLabel" name="label_generate_rows">
+                   <property name="minimumSize">
+                    <size>
+                     <width>62</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>rows</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="GenerateRowsSpinBox">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_15">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_51">
+                 <item>
+                  <widget class="QLabel" name="label_generate_cols">
+                   <property name="minimumSize">
+                    <size>
+                     <width>62</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>cols</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="GenerateColsSpinBox">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_16">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_52">
+                 <item>
+                  <widget class="QLabel" name="label_generate_xlmopt">
+                   <property name="minimumSize">
+                    <size>
+                     <width>62</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>xlmopt</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="GenerateXlmoptspinBox">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_17">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_54">
+                 <item>
+                  <widget class="QLabel" name="label_generate_klmopt">
+                   <property name="minimumSize">
+                    <size>
+                     <width>62</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>klmopt</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="GenerateKlmoptSpinBox">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_18">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_59" stretch="1,1,1">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_55">
+                 <item>
+                  <widget class="QLabel" name="label_generate_icropt">
+                   <property name="minimumSize">
+                    <size>
+                     <width>62</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>icropt</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="GenerateIcroptComboBox">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_13">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_56">
+                 <item>
+                  <widget class="QLabel" name="label_generate_ocmopt">
+                   <property name="minimumSize">
+                    <size>
+                     <width>62</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>ocmopt</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="GenerateOcmoptComboBox">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_14">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_57">
+                 <item>
+                  <widget class="QLabel" name="label_generate_version">
+                   <property name="minimumSize">
+                    <size>
+                     <width>62</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>version</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="GenerateVersionCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_42">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="SimulateGroupBox">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>[Simulate]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_14">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_72" stretch="1,1,1,1">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_66">
+              <item>
+               <widget class="QLabel" name="label_simulate_target">
+                <property name="minimumSize">
+                 <size>
+                  <width>68</width>
+                  <height>26</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>target</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="SimulateTargetComboBox">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>26</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_20">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_67">
+              <item>
+               <widget class="QLabel" name="label_simulate_stage">
+                <property name="minimumSize">
+                 <size>
+                  <width>68</width>
+                  <height>26</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>stage</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="SimulateStageComboBox">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>26</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_21">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_68">
+              <item>
+               <widget class="QLabel" name="label_simulate_fake_qf">
+                <property name="minimumSize">
+                 <size>
+                  <width>68</width>
+                  <height>26</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>fake_qf</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="FakeQfCheckBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>26</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_41">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_69">
+              <item>
+               <widget class="QLabel" name="label_simulate_dump_ftmp">
+                <property name="minimumSize">
+                 <size>
+                  <width>68</width>
+                  <height>26</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>dump_ftmp</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="SimulateDumpFtmpComboBox">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>26</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_22">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_70">
+            <item>
+             <widget class="QLabel" name="label_simulate_names">
+              <property name="minimumSize">
+               <size>
+                <width>62</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>names</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="SimulateNamesInput">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_71">
+            <item>
+             <widget class="QLabel" name="label_simulate_image">
+              <property name="minimumSize">
+               <size>
+                <width>62</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>image</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="SimulateImageInput">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QToolButton" name="SimulateOptionToolButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="cursor">
+             <cursorShape>ArrowCursor</cursorShape>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="tabletTracking">
+             <bool>false</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"> QToolButton {
+                text-align: center;  /* 使文本居中 */
+                padding-right: 16px;  /* 确保箭头和文本有适当的间距 */
+            }</string>
+            </property>
+            <property name="text">
+             <string>可选</string>
+            </property>
+            <property name="popupMode">
+             <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>false</bool>
+            </property>
+            <property name="arrowType">
+             <enum>Qt::ArrowType::RightArrow</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="SimulateOptionGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>可选</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_93">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_75">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_log_time">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>log_time</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="SimulateLogTimeCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_24">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_76">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_log_io">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>log_io</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="SimulateLogIOCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_25">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_77">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_show">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>show</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="SimulateShowCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_26">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_78">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_save">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>save</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="SimulateSaveCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_27">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_85">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_80">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_logCalcTime">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>logCalcTime</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="SimulateLogCalcTimeCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_28">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_81">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_log_io_3">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>logIOInfo</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="SimulateLogIOInfoCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_29">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_82">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_dump_weights">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>dump_weights</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="SimulateDumpWeightsCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_30">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_83">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_dump_bias">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>dump_bias</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="SimulateDumpBiasCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_31">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_86" stretch="1,1,2">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_84">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_cudamode">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>cudamode</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="SimulateCudaModeCheckBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_32">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_79">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_ebytes">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>91</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>ebytes</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="SimulateEbytesComboBox">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_33">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_23">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_94">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_89">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_dump_ftmp_start">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>dump_ftmp_start</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulateDumpFtmpStartInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_91">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_dump_ftmp_end">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>dump_ftmp_end</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulateDumpFtmpEndInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_95">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_87">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_dump_bias_start">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>dump_bias_start</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulateDumpBiasStartInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_88">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_dump_bias_end">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>dump_bias_end</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulateDumpBiasEndInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_96">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_90">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_dump_weights_start">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>dump_weights_start</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulateDumpWeightsStartInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_92">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_dump_weights_end">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>dump_weights_end</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulateDumpWeightsEndInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_64">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_60">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_names_path">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>names_path</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulateNamesPathInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_61">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_decode_dll">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>decode_dll</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulateDecodeDllInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_65">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_62">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_post_method">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>post_method</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulatePostMethodInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_63">
+                 <item>
+                  <widget class="QLabel" name="label_simulate_ff_backend">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>116</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>ff_backend</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="SimulateFFBackendInput">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="ConfigGroupBox">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>[Config]</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_73">
+            <item>
+             <widget class="QLabel" name="label_config_customop_on">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>117</width>
+                <height>26</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>customop_on</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="ConfigCustomOpOnInput">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>26</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_74">
+            <item>
+             <widget class="QLabel" name="label_config_customop_config">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>117</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>customop_config</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="ConfigCustomopConfigInput"/>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_23">
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="ConfirmButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>60</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>60</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>确认</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>NetworkInput</tabstop>
+  <tabstop>ChooseNetworkButton</tabstop>
+  <tabstop>NameInput</tabstop>
+  <tabstop>FrameWorkComboBox</tabstop>
+  <tabstop>FrameVersionComboBox</tabstop>
+  <tabstop>PostMethodComboBox</tabstop>
+  <tabstop>PreMethodComboBox</tabstop>
+  <tabstop>ShapeInput</tabstop>
+  <tabstop>InputFormatComboBox</tabstop>
+  <tabstop>ChannelSwapInput</tabstop>
+  <tabstop>PreMeanInput</tabstop>
+  <tabstop>PreScaleInput</tabstop>
+  <tabstop>WeightInput</tabstop>
+  <tabstop>CustomOpInput</tabstop>
+  <tabstop>DebugCheckBox</tabstop>
+  <tabstop>TargetComboBox</tabstop>
+  <tabstop>CustomopConfigOpInput</tabstop>
+  <tabstop>ConfigInput</tabstop>
+  <tabstop>CustomOpOnInput</tabstop>
+  <tabstop>PassOnInput</tabstop>
+  <tabstop>PassOffInput</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

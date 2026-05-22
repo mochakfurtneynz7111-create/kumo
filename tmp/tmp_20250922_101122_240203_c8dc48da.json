@@ -1,0 +1,8 @@
+{
+    "time": "2025-09-22 10:12:01",
+    "acc": 0.524,
+    "runtime": 29.6,
+    "memory": 502.12,
+    "json_file": "imodel/yolov5s_soft/yolov5s_BY.json",
+    "raw_file": "imodel/yolov5s_soft/yolov5s_BY.raw"
+}
