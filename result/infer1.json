@@ -1,0 +1,52 @@
+[
+    {
+        "memory": "6.465MB",
+        "runtime": "8.831s",
+        "model": "final_model.pth",
+        "time": "2025-06-23T11:05:06.662217",
+        "accuracy": "33.33%",
+        "precision": "33.33%",
+        "recall": "33.33%",
+        "f1_score": "33.33%"
+    },
+    {
+        "memory": "6.461MB",
+        "runtime": "8.879s",
+        "model": "final_model.pth",
+        "time": "2025-06-23T10:54:55.123077",
+        "accuracy": "33.33%",
+        "precision": "33.33%",
+        "recall": "33.33%",
+        "f1_score": "33.33%"
+    },
+    {
+        "memory": "6.461MB",
+        "runtime": "8.048s",
+        "model": "final_model.pth",
+        "time": "2025-06-23T10:54:27.851549",
+        "accuracy": "33.33%",
+        "precision": "33.33%",
+        "recall": "33.33%",
+        "f1_score": "33.33%"
+    },
+    {
+        "memory": "6.457MB",
+        "runtime": "9.205s",
+        "model": "final_model.pth",
+        "time": "2025-06-23T10:54:24.041613",
+        "accuracy": "33.33%",
+        "precision": "33.33%",
+        "recall": "33.33%",
+        "f1_score": "33.33%"
+    },
+    {
+        "memory": "6.457MB",
+        "runtime": "8.570s",
+        "model": "final_model.pth",
+        "time": "2025-06-23T10:51:57.111233",
+        "accuracy": "33.33%",
+        "precision": "33.33%",
+        "recall": "33.33%",
+        "f1_score": "33.33%"
+    }
+]

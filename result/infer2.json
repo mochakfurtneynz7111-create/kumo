@@ -1,0 +1,12 @@
+[
+    {
+        "memory": "6.465MB",
+        "runtime": "8.831s",
+        "model": "final_model.pth",
+        "time": "2025-06-23T11:05:06.662217",
+        "accuracy": "33.33%",
+        "precision": "33.33%",
+        "recall": "33.33%",
+        "f1_score": "33.33%"
+    }
+]

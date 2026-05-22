@@ -1,0 +1,217 @@
+
+/* 任务栏样式 */
+TaskItem {
+    background-color: transparent;
+}
+
+TaskItem:hover{
+    background-color: #e0e0e0;
+}
+
+
+/* 标签样式 */
+TaskItem QLabel {
+    color: #333333;
+    font: 12px;
+    /* padding-left: 6px; */
+}
+
+/* 选中状态 */
+TaskItem[selected="true"] {
+    background-color: #be76a6c2;
+}
+
+/* 主界面相关样式 */
+#widget_right_down QPlainTextEdit {
+    background-color: #202020;
+    color: white;
+    /* border: none; */
+}
+
+#tabScrollArea {
+    border: none;
+    border-left: 1px solid rgb(152, 152, 152);
+    border-bottom: 1px solid rgb(152, 152, 152);
+}
+
+#splitter_left_v > QWidget {
+    border: 1px solid  rgb(152, 152, 152);
+    border-top: none;
+    border-left: none;
+    /* border: none; */
+}
+
+#splitter_right_v > QWidget {
+    border-bottom: 1px solid  rgb(152, 152, 152);
+    /* border: none; */
+}
+
+#splitter_left_v QPushButton {
+    background-color:#1f6feb;
+    border-radius: 4px;
+    /* margin: 2px; */
+    padding: 0px;
+    height: 25px;
+    width: 80px;
+    color: white;
+}
+
+#splitter_left_v QToolButton {
+    background-color:#1f6feb;
+    border-radius: 4px;
+    padding: 0px;
+    /* margin: 2px; */
+    max-height: 25px;
+    width: 80px;
+    color: white;
+}
+
+#splitter_left_v QPushButton:hover {
+    background-color:#388bfd;
+    color: white;
+}
+
+#splitter_left_v QToolButton:hover {
+    background-color:#388bfd;
+    color: white;
+}
+
+#ChipMenu {
+	border: 1px solid #CCCCCC; /* 边框宽度为1px，颜色为#CCCCCC */
+	border-radius: 6px; /* 边框圆角 */
+	background-color: #FEFEFE; /* 背景颜色 */
+	padding: 0px;
+}
+
+#ChipMenu::item {
+	border: 0px solid transparent;
+	background-color: transparent;
+	color: black; /* 文本颜色 */
+    height: 20px;
+	padding: 0px 60px 0px 60px;
+    text-align: center;
+}
+
+#ChipMenu::item:selected { /* 为菜单项在selected的状态 */
+	background-color: #EDEDEF;
+}
+
+#ChipMenu::item:disabled {
+    background-color: rgb(96, 96, 96);
+	color: #CCCCCC;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+/* #ChipMenu::item:bottom{ 
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    color: #e12222;
+} */
+
+#ChipMenu::item:hover {
+    background-color: rgb(88, 88, 88);
+    border: none;
+}
+
+
+
+#widget_left_middle {
+    background-color: #fefefe;
+}
+
+
+#splitter_left_v QTableView {
+    background-color: #c6c6c6;
+    border: 1px solid rgb(156, 156, 156);
+    border-radius: 4px;
+}
+
+#ModelLoad QLabel {
+    font-size: 12px;
+}
+
+/* 菜单栏 */
+#MenuFile QToolButton,
+#MenuChip QToolButton {
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 5px;
+    padding-bottom: 2px;
+    margin: 0px;
+    border: none;
+    background-color: transparent;
+    qproperty-iconSize: 36px;
+    qproperty-toolButtonStyle: ToolButtonIconOnly;
+}
+
+
+#MenuFile > *[class="menu-button"],
+#MenuChip > *[class="menu-button"] {
+    background-color: transparent;
+    padding: 4px;
+    border: none;
+}
+/* 悬停状态：蓝色半透明背景 + 蓝色边框 */
+#MenuFile > *[class="menu-button"]:hover,
+#MenuChip > *[class="menu-button"]:hover {
+    background-color: rgba(0, 0, 255, 20);  /* 蓝色透明（透明度20%） */
+    border: 1px solid rgba(88, 88, 255, 200);
+    border-radius: 2px;  /* 可选圆角 */
+}
+
+
+/* QPlainTextEdit {
+    background-color: rgb(29, 29, 29);
+    border: 2px solid rgb(209, 209, 209);  
+} */
+
+
+
+#ControlPanel QTabWidget::pane {
+    border: none;
+    background-color: transparent;
+}
+
+#menuTabWidget::pane {
+    border: none;
+    background-color: transparent;
+    /* border-radius: 4px; */
+    border-bottom: 1px solid rgb(43, 87, 154);
+    height: 84px;
+}
+
+
+#menuTabWidget {
+    background-color: black;
+    border:2px solid rgb(43, 87, 154);
+}
+
+#menuTabWidget QTabBar {
+    background-color: transparent;
+}
+
+#menuTabWidget QTabBar::tab {
+    background-color: #0062ad;
+    color: #fff;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    border-radius: 0px;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    padding: 4px 4px;
+    /* margin-right: 2px; */
+    font-size: 14px;
+    icon-size: #fff;
+}
+
+#menuTabWidget QTabBar::tab:selected {
+    background-color: white;
+    color: #000;
+}
+
+
+
+/* #menuTabWidget QTabBar::tab:hover {
+    background: #e0e0e0;
+} */

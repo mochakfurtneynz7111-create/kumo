@@ -1,0 +1,41 @@
+[
+  {
+    "name": "convert",
+    "required_params": [
+      {"field": "model", "label": "Model File", "type": "text"},
+      {"field": "framework", "label": "Framework", "type": "select", "options": [0, 5, 6], "option_labels": ["Caffe", "ONNX", "ABSTRACT"], "default": "Caffe"},
+      {"field": "insert_op_conf", "label": "Insert Op Config", "type": "text"},
+      {"field": "input_shape", "label": "Input Shape", "type": "text"},
+      {"field": "image_list", "label": "Image List", "type": "text"},
+      {"field": "batch_num", "label": "Batch Number", "type": "text"},
+      {"field": "output", "label": "Output Path", "type": "text"},
+      {"field": "soc_version", "label": "SoC Version", "type": "select", "options": ["SS626V100", "SS928V100"]}
+    ],
+    "optional_params": [
+      {"field": "mode", "label": "Run Mode", "type": "select", "options": [0, 1, 3], "default": 0},
+      {"field": "weight", "label": "Weight File", "type": "text"},
+      {"field": "om", "label": "Offline Model", "type": "text"},
+      {"field": "custom_ops_lib", "label": "Custom Ops Lib", "type": "text"},
+      {"field": "json", "label": "JSON File", "type": "text"},
+      {"field": "input_type", "label": "Input Type", "type": "text"},
+      {"field": "input_format", "label": "Input Format", "type": "select", "options": ["NCHW"], "default": "NCHW"},
+      {"field": "output_type", "label": "Output Type", "type": "text"},
+      {"field": "out_nodes", "label": "Output Nodes", "type": "text"},
+      {"field": "gfpq_param_file", "label": "Quant Param File", "type": "text"},
+      {"field": "compile_mode", "label": "Compile Mode", "type": "select", "options": [0, 1], "option_labels": ["8bit", "16bit"], "default": "8bit"},
+      {"field": "weight_quant_per_channel", "label": "Per-Channel Quant", "type": "select", "options": [0, 1], "default": 0},
+      {"field": "online_model_type", "label": "Online Model Type", "type": "number", "min": 0, "max": 7, "default": 0},
+      {"field": "internal_stride", "label": "Alignment Bytes", "type": "select", "options": [16, 32, 64, 128, 256], "default": 64},
+      {"field": "fusion_switch_file", "label": "Fusion Switch", "type": "text"},
+      {"field": "net_optimize_enable", "label": "Net Optimize", "type": "select", "options": [0, 1], "default": 1},
+      {"field": "layer_fusion_enable", "label": "Layer Fusion", "type": "select", "options": [0, 1], "default": 1},
+      {"field": "layer_m2m_enable", "label": "Data Sharing", "type": "select", "options": [0, 1], "default": 1},
+      {"field": "save_original_model", "label": "Save Original", "type": "select", "options": ["false", "true"], "default": "false"},
+      {"field": "dump_mode", "label": "Dump Mode", "type": "select", "options": [0, 1], "default": 0},
+      {"field": "dump_data", "label": "Dump Data", "type": "text"},
+      {"field": "is_precheck", "label": "Pre-check", "type": "select", "options": [0, 1], "default": 1},
+      {"field": "log_level", "label": "Log Level", "type": "number", "min": 0, "max": 3, "default": 1},
+      {"field": "forward_quantization_option", "label": "Quant Option", "type": "number", "min": 0, "max": 3, "default": 0}
+    ]
+  }
+]

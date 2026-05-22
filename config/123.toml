@@ -1,0 +1,78 @@
+[parse]
+framework = pytorch
+framwork_version = 1.9
+post_method = nop
+pre_method = resize
+input = 1,224,224,3
+input_format = NHWC
+chann_swap = 2,1,0
+pre_mean = 123.675, 116.28, 103.53
+pre_scale = 58.395, 57.12, 57.375
+jr_path = .\json&raw
+
+[optimize]
+debug = false
+target = BUYI
+json = .\json&raw\_parsed.json
+raw = .\json&raw\_parsed.raw
+jr_path = .\json&raw
+
+[quantize]
+forward_mode = image
+per = tensor
+bits = 8
+saturation = kld
+forward_dir = images\coco
+forward_list = images\coco.txt
+batch = 1
+bin_num = 4096
+dump_ftmp = false
+only_norm = false
+no_transinput = false
+before_relu = false
+verbose = false
+json = .\json&raw\_optimized.json
+raw = .\json&raw\_optimized.raw
+jr_path = .\json&raw
+
+[adapt]
+target = BUYI
+debug = false
+json = .\json&raw\_quantized.json
+raw = .\json&raw\_quantized.raw
+jr_path = .\json&raw
+
+[generate]
+rows = 4
+cols = 4
+xlmopt = 3
+klmopt = 3
+icropt = 1
+ocmopt = 1
+version = false
+json = .\json&raw\_adapted.json
+raw = .\json&raw\_adapted.raw
+jr_path = .\json&raw
+
+[simulate]
+target = BUYI
+fake_qf = false
+dump_ftmp = SFB
+names = names/coco.names
+image = images/coco/000000000139.jpg
+log_time = false
+log_io = false
+show = false
+save = false
+ebytes = 1
+logcalctime = false
+logioinfo = false
+dump_weights = false
+dump_bias = false
+cudamode = false
+json = .\json&raw\_BY.json
+raw = .\json&raw\_BY.raw
+log_path = .\logs
+
+[config]
+

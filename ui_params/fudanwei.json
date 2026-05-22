@@ -1,0 +1,144 @@
+[
+	{
+		"name": "parse",
+		"required_params": [
+			{"field": "network","label": "Network","type": "text"},
+			{"field": "net_name","label": "Name","type": "text"},
+			{"field": "framework","label": "Framework","type": "select","options": ["pytorch","tensorflow","Caffe","darknet","onnx"],"default": "pytorch"},
+			{"field": "framework_version","label": "Framework Version","type": "select","options": ["1.9","1.6"],"default": "1.9"},
+			{"field": "post_method","label": "Post Method","type": "select","options": ["nop","softmax","multiyolo","region","custom"],"default": "nop"},
+			{"field": "pre_method","label": "Pre Method","type": "select","options": ["resize","nop"],"default": "resize"},
+			{"field": "input","label": "Input","type": "text","default": "1,224,224,3"},
+			{"field": "input_format","label": "Input Format","type": "select","options": ["NHWC","FD"],"default": "NHWC"},
+			{"field": "chann_swap","label": "Chann Swap","type": "text","default": "2,1,0"},
+			{"field": "pre_mean","label": "Pre Mean","type": "text","default": "123.675, 116.28, 103.53"},
+			{"field": "pre_scale","label": "Pre Scale","type": "text","default": "58.395, 57.12, 57.375"},
+			{"field": "weights", "type": "text"},
+			{"field": "custom_op", "type": "text"},
+			{"field": "jr_path", "type": "text", "default": ".\\json&raw"}
+		]
+	},
+	{
+		"name": "optimize",
+		"required_params":[
+			{"field": "debug", "type": "select", "options": ["true", ""]},
+			{"field": "target", "label": "target", "type": "select", "options": ["BUYI"]},
+			{"field": "jr_path", "type": "text", "default": ".\\json&raw"},
+			{"field": "json", "type": "text", "default": ".\\json&raw\\_parsed.json"},
+			{"field": "raw", "type": "text", "default": ".\\json&raw\\_parsed.raw"}
+		],
+		"optional_params":[
+			{"field": "customop_config", "type": "text"},
+			{"field": "config", "type": "text"},
+			{"field": "customop_op", "type": "text"},
+			{"field": "pass_on", "type": "text"},
+			{"field": "pass_off", "type": "text"}
+		]
+	},
+	{
+		"name": "quantize",
+		"required_params":[
+			{"field": "forward_mode", "label": "Forward Mode", "type": "select", "options": ["image", "ftmp"], "default": "image"},
+			{"field": "per", "type": "select", "options": ["tensor", "channel"], "default": "tensor"},
+			{"field": "bits", "type": "select", "options": [8, 16], "default": 8},
+			{"field": "saturation", "type": "select", "options": ["kld", "null", "ems", "nsigma"], "default": "kld"},
+			{"field": "forward_dir", "type": "text", "default": "images\\coco"},
+			{"field": "forward_list", "type": "text", "default": "images\\coco.txt"},
+			{"field": "target","type": "select", "options": ["buyi"]},
+			{"field": "jr_path", "type": "text", "default": ".\\json&raw"},
+			{"field": "json", "type": "text", "default": ".\\json&raw\\_optimized.json"},
+			{"field": "raw", "type": "text", "default": ".\\json&raw\\_optimized.raw"}
+		],
+		"optional_params":[
+			{"field": "batch", "type": "text", "default": "1"},
+			{"field": "bin_num", "type": "text", "default": "4096"},
+			{"field": "dump_ftmp", "type": "select", "options": ["true", ""]},
+			{"field": "only_norm", "type": "select", "options": ["true", ""]},
+			{"field": "no_transinput", "type": "select", "options": ["true", ""]},
+			{"field": "before_relu", "type": "select", "options": ["true", ""]},
+			{"field": "verbose", "type": "select", "options": ["true", ""]},
+			{"field": "names_file", "type": "text"},
+			{"field": "ftmp_csv", "type": "text"},
+			{"field": "raw_csv", "type": "text"},
+			{"field": "decode_dll", "type": "text"}
+		]
+	},
+	{
+		"name": "adapt",
+		"required_params": [
+			{"field": "target", "type": "select", "options": ["BUYI"]},
+			{"field": "debug", "type": "select", "options": ["true", ""]},
+			{"field": "jr_path", "type": "text", "default": ".\\json&raw"},
+			{"field": "json", "type": "text", "default": ".\\json&raw\\_quantized.json"},
+			{"field": "raw", "type": "text", "default": ".\\json&raw\\_quantized.raw"}
+		],
+		"optional_params": [
+			{"field": "customop_config", "type": "text"},
+			{"field": "config", "type": "text"},
+			{"field": "customop_op", "type": "text"},
+			{"field": "pass_on", "type": "text"},
+			{"field": "pass_off", "type": "text"}
+		]
+	},
+	{
+		"name": "generate",
+		"required_params": [
+			{"field": "jr_path", "type": "text", "default": ".\\json&raw"},
+			{"field": "json", "type": "text", "default": ".\\json&raw\\_adapted.json"},
+			{"field": "raw", "type": "text", "default": ".\\json&raw\\_adapted.raw"}
+		],
+		"optional_params": [
+			{"field": "ddr_base", "type": "text"},
+			{"field": "rows", "type": "number", "min": 1, "max": 4, "default": 4},
+			{"field": "cols", "type": "number", "min": 1, "max": 4, "default": 4},
+			{"field": "xlmopt", "type": "number", "min": 1, "max": 3, "default": 3},
+			{"field": "klmopt", "type": "number", "min": 1, "max": 3, "default": 3},
+			{"field": "icropt", "type": "select", "options": [0, 1], "default": 0},
+			{"field": "ocmopt", "type": "select", "options": [0, 1], "default": 0},
+			{"field": "version", "type": "select", "options": ["true", ""]}
+		]
+	},
+	{
+		"name": "simulate",
+		"required_params": [
+			{"field": "target", "type": "select", "options": ["BUYI"]},
+			{"field": "stage", "type": "select", "options": ["BY", "parsed", "optimized", "quantized", "adapted"]},
+			{"field": "fake_qf", "type": "select", "options": ["true", ""]},
+			{"field": "dump_ftmp", "type": "select", "options": ["SFB", "SQB", "SFT", "SQT", "HQB"]},
+			{"field": "names", "type": "text", "default": "names/coco.names"},
+			{"field": "image", "type": "text", "default": "images/coco/000000000139.jpg"},
+			{"field": "json", "type": "text", "default": ".\\json&raw\\_BY.json"},
+			{"field": "raw", "type": "text", "default": ".\\json&raw\\_BY.raw"},
+			{"field": "log_path", "type": "text", "default": ".\\logs"}
+		],
+		"optional_params": [
+			{"field": "log_time", "type": "select", "options": ["true", ""]},
+			{"field": "log_io", "type": "select", "options": ["true", ""]},
+			{"field": "show", "type": "select", "options": ["true", ""]},
+			{"field": "save", "type": "select", "options": ["true", ""]},
+			{"field": "logCalcTime", "type": "select", "options": ["true", ""]},
+			{"field": "logIOInfo", "type": "select", "options": ["true", ""]},
+			{"field": "dump_weights", "type": "select", "options": ["true", ""]},
+			{"field": "dump_bias", "type": "select", "options": ["true", ""]},
+			{"field": "cudamode", "type": "select", "options": ["true", ""]},
+			{"field": "ebytes", "type": "select", "options": [1, 2, 4]},
+			{"field": "dump_ftmp_start", "type": "text"},
+			{"field": "dump_ftmp_end", "type": "text"},
+			{"field": "dump_bias_start", "type": "text"},
+			{"field": "dump_bias_end", "type": "text"},
+			{"field": "dump_weights_start", "type": "text"},
+			{"field": "dump_weights_end", "type": "text"},
+			{"field": "names_path", "type": "text"},
+			{"field": "decode_dll", "type": "text"},
+			{"field": "post_method", "type": "text"},
+			{"field": "ff_backend", "type": "text"}
+		]
+	},
+	{
+		"name": "config",
+		"required_params": [
+			{"field": "customop_on", "type": "text"},
+			{"field": "customop_config", "type": "text"}
+		]
+	}
+]

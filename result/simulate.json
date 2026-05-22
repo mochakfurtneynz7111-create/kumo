@@ -1,0 +1,34 @@
+[
+    {
+        "time": "2025-10-15 17:05:03",
+        "acc": 0.524,
+        "runtime": 26.15,
+        "memory": 504.05,
+        "json_file": "imodel/yolov5s_soft/yolov5s_BY.json",
+        "raw_file": "imodel/yolov5s_soft/yolov5s_BY.raw"
+    },
+    {
+        "time": "2025-10-15 17:06:37",
+        "acc": 0.524,
+        "runtime": 26.7,
+        "memory": 503.79,
+        "json_file": "imodel/yolov5s_soft/yolov5s_BY.json",
+        "raw_file": "imodel/yolov5s_soft/yolov5s_BY.raw"
+    },
+    {
+        "time": "2025-11-08 23:13:33",
+        "acc": 0.524,
+        "runtime": 25.99,
+        "memory": 503.02,
+        "json_file": "imodel/yolov5s_soft/yolov5s_BY.json",
+        "raw_file": "imodel/yolov5s_soft/yolov5s_BY.raw"
+    },
+    {
+        "time": "2025-11-09 01:28:52",
+        "acc": 0.524,
+        "runtime": 26.34,
+        "memory": 502.54,
+        "json_file": "imodel/yolov5s_soft/yolov5s_BY.json",
+        "raw_file": "imodel/yolov5s_soft/yolov5s_BY.raw"
+    }
+]

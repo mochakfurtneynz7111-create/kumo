@@ -1,0 +1,19 @@
+[
+	{
+		"name": "optimize",
+		"required_params":[
+			{"field": "debug", "type": "checkbox"},
+			{"field": "target", "label": "target", "type": "select", "options": ["BUYI"]},
+			{"field": "jr_path", "type": "text", "default": ".\\json&raw"},
+			{"field": "json", "type": "text", "default": ".\\json&raw\\_parsed.json"},
+			{"field": "raw", "type": "text", "default": ".\\json&raw\\_parsed.raw"}
+		],
+		"optional_params":[
+			{"field": "customop_config", "type": "text"},
+			{"field": "config", "type": "text"},
+			{"field": "customop_op", "type": "text"},
+			{"field": "pass_on", "type": "text"},
+			{"field": "pass_off", "type": "text"}
+		]
+	}
+]

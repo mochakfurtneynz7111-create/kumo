@@ -1,0 +1,13 @@
+[
+    {
+        "name": "optimize",
+        "required_params": [
+            {"field": "onnx_model_path", "label": "onnx_model_path" , "type": "text", "default": "best_ckpt1121.onnx"},
+            {"field": "platform", "label": "platform", "type": "select", "options": ["rk3562", "rk3566", "rk3568", "rk3588", "rk1808", "rv1109", "rv1126"]},
+            {"field": "dtype", "label": "dtype", "type": "select", "options": ["i8", "fp", "u8"]}
+        ],
+        "optional_params": [
+            {"field": "output_rknn_path", "label": "save_path" ,"type": "text", "default": "best_ckpt1121.rknn"}
+        ]
+    }
+]
